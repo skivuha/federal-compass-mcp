@@ -119,7 +119,7 @@ export async function handleGetJobDetails(
   let searchResult;
   try {
     searchResult = await searchJobs(client, {
-      ControlNumber: params.job_id,
+      Keyword: params.job_id,
       ResultsPerPage: 1,
     });
   } catch {
