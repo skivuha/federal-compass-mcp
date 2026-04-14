@@ -120,7 +120,7 @@ export async function handleGetJobDetails(
   try {
     searchResult = await searchJobs(client, {
       Keyword: params.job_id,
-      ResultsPerPage: 1,
+      ResultsPerPage: 10,
     });
   } catch {
     return {
