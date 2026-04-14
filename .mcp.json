@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "federal-compass": {
+      "command": "npx",
+      "args": ["-y", "federal-compass-mcp@latest"],
+      "env": {
+        "USAJOBS_API_KEY": "",
+        "USAJOBS_EMAIL": ""
+      }
+    }
+  }
+}
