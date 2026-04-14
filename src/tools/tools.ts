@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { AxiosInstance } from 'axios';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { handleSearchJobs, handleGetJobDetails } from './search.js';
-import { handleSaveResume, handleGetResume } from './resume.js';
+import { handleSaveCV, handleGetCV } from './cv.js';
 import {
   handleExplainConcept,
   handleFindMatchingJobs,
@@ -38,20 +38,20 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
   );
 
   server.tool(
-    'save_resume',
-    'Save your resume text locally for automatic use in job matching and qualification checks. The resume is stored only on your machine.',
+    'save_cv',
+    'Save your CV text locally for automatic use in job matching and qualification checks. The CV is stored only on your machine.',
     {
-      content: z.string().describe('Resume text content'),
-      format: z.string().optional().describe('Original format of the resume: "pdf", "txt", or "md" (default: "txt")'),
+      content: z.string().describe('CV text content'),
+      format: z.string().optional().describe('Original format of the CV: "pdf", "txt", or "md" (default: "txt")'),
     },
-    async (params) => handleSaveResume(params),
+    async (params) => handleSaveCV(params),
   );
 
   server.tool(
-    'get_resume',
-    'Read your saved resume. Returns the resume text and metadata (when it was saved, original format).',
+    'get_cv',
+    'Read your saved CV. Returns the CV text and metadata (when it was saved, original format).',
     {},
-    async () => handleGetResume(),
+    async () => handleGetCV(),
   );
 
   server.tool(
@@ -65,7 +65,7 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
 
   server.tool(
     'find_matching_jobs',
-    'Find federal jobs that match your saved resume. Extracts skills and keywords from your resume and searches USAJobs. Requires a saved resume.',
+    'Find federal jobs that match your saved CV. Extracts skills and keywords from your CV and searches USAJobs. Requires a saved CV.',
     {
       results_per_page: z.number().optional().describe('Number of results per search query (default: 25, max: 500)'),
     },
@@ -74,7 +74,7 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
 
   server.tool(
     'check_qualification',
-    'Compare your saved resume against a specific job posting. Returns your resume and the job requirements side by side for analysis. Requires a saved resume.',
+    'Compare your saved CV against a specific job posting. Returns your CV and the job requirements side by side for analysis. Requires a saved CV.',
     {
       job_id: z.string().describe('Job ID (MatchedObjectId from search results)'),
     },

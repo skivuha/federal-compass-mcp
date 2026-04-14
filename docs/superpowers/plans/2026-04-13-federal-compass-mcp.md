@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build an MCP server that connects any AI client to the USAJobs API, enabling federal job search, resume analysis, and federal career guidance for private-sector tech professionals.
+**Goal:** Build an MCP server that connects any AI client to the USAJobs API, enabling federal job search, CV analysis, and federal career guidance for private-sector tech professionals.
 
-**Architecture:** Stdio-based MCP server with 7 tools. USAJobs API client with axios + debug logging. Codelist cache with 30-day TTL stored in `~/.federal-compass/`. Built-in federal glossary for concept explanations. Resume stored as JSON locally.
+**Architecture:** Stdio-based MCP server with 7 tools. USAJobs API client with axios + debug logging. Codelist cache with 30-day TTL stored in `~/.federal-compass/`. Built-in federal glossary for concept explanations. CV stored as JSON locally.
 
 **Tech Stack:** TypeScript, Node.js v20+, @modelcontextprotocol/sdk, axios, debug, zod, vitest, rollup
 
@@ -20,14 +20,14 @@
 | `src/cache/codelist-cache.ts` | Fetch, cache, read 6 codelists with 30-day TTL |
 | `src/data/federal-glossary.ts` | Static glossary: GS tables, clearances, hiring paths |
 | `src/tools/search.ts` | `search_jobs` and `get_job_details` tool handlers |
-| `src/tools/resume.ts` | `save_resume` and `get_resume` tool handlers |
+| `src/tools/cv.ts` | `save_cv` and `get_cv` tool handlers |
 | `src/tools/advisor.ts` | `explain_federal_concept`, `find_matching_jobs`, `check_qualification` tool handlers |
 | `src/tools/tools.ts` | Collects and exports all tool definitions |
 | `tests/api/usajobs-client.test.ts` | API client tests |
 | `tests/cache/codelist-cache.test.ts` | Codelist cache tests |
 | `tests/data/federal-glossary.test.ts` | Glossary lookup tests |
 | `tests/tools/search.test.ts` | Search tool tests |
-| `tests/tools/resume.test.ts` | Resume tool tests |
+| `tests/tools/cv.test.ts` | CV tool tests |
 | `tests/tools/advisor.test.ts` | Advisor tool tests |
 | `rollup.config.mjs` | Bundle config for single-file output |
 | `server.json` | MCP Registry metadata |
@@ -866,11 +866,11 @@ Expected: All 4 tests PASS.
 
 ---
 
-### Task 6: Resume Tools
+### Task 6: CV Tools
 
 **Files:**
-- Create: `src/tools/resume.ts`
-- Create: `tests/tools/resume.test.ts`
+- Create: `src/tools/cv.ts`
+- Create: `tests/tools/cv.test.ts`
 
 - [ ] **Step 1: Write failing tests**
 
@@ -880,81 +880,81 @@ import * as fs from 'node:fs/promises';
 
 vi.mock('node:fs/promises');
 
-describe('resume tools', () => {
+describe('cv tools', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
   });
 
-  describe('handleSaveResume', () => {
-    it('saves resume as JSON with metadata', async () => {
-      const { handleSaveResume } = await import('../src/tools/resume.js');
+  describe('handleSaveCV', () => {
+    it('saves CV as JSON with metadata', async () => {
+      const { handleSaveCV } = await import('../src/tools/cv.js');
 
       vi.mocked(fs.mkdir).mockResolvedValueOnce(undefined);
       vi.mocked(fs.writeFile).mockResolvedValueOnce(undefined);
 
-      const result = await handleSaveResume({
+      const result = await handleSaveCV({
         content: 'Senior Engineer with 8 years experience',
         format: 'txt',
       });
 
       expect(fs.writeFile).toHaveBeenCalledWith(
-        expect.stringContaining('resume.json'),
+        expect.stringContaining('cv.json'),
         expect.stringContaining('Senior Engineer'),
       );
       expect(result.content[0].text).toContain('saved');
     });
   });
 
-  describe('handleGetResume', () => {
-    it('returns resume content and metadata', async () => {
-      const { handleGetResume } = await import('../src/tools/resume.js');
+  describe('handleGetCV', () => {
+    it('returns CV content and metadata', async () => {
+      const { handleGetCV } = await import('../src/tools/cv.js');
 
       const stored = {
-        content: 'My resume text',
+        content: 'My CV text',
         savedAt: '2026-04-13T00:00:00.000Z',
         format: 'txt',
       };
       vi.mocked(fs.readFile).mockResolvedValueOnce(JSON.stringify(stored));
 
-      const result = await handleGetResume();
+      const result = await handleGetCV();
 
-      expect(result.content[0].text).toContain('My resume text');
+      expect(result.content[0].text).toContain('My CV text');
     });
 
-    it('returns informational message when no resume exists', async () => {
-      const { handleGetResume } = await import('../src/tools/resume.js');
+    it('returns informational message when no CV exists', async () => {
+      const { handleGetCV } = await import('../src/tools/cv.js');
 
       vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('ENOENT'));
 
-      const result = await handleGetResume();
+      const result = await handleGetCV();
 
-      expect(result.content[0].text).toContain('No resume saved yet');
+      expect(result.content[0].text).toContain('No CV saved yet');
     });
   });
 
-  describe('requireResume', () => {
-    it('returns resume content when file exists', async () => {
-      const { requireResume } = await import('../src/tools/resume.js');
+  describe('requireCV', () => {
+    it('returns CV content when file exists', async () => {
+      const { requireCV } = await import('../src/tools/cv.js');
 
       const stored = {
-        content: 'Resume text',
+        content: 'CV text',
         savedAt: '2026-04-13T00:00:00.000Z',
         format: 'txt',
       };
       vi.mocked(fs.readFile).mockResolvedValueOnce(JSON.stringify(stored));
 
-      const result = await requireResume();
+      const result = await requireCV();
 
-      expect(result.content).toBe('Resume text');
+      expect(result.content).toBe('CV text');
     });
 
-    it('throws when no resume exists', async () => {
-      const { requireResume } = await import('../src/tools/resume.js');
+    it('throws when no CV exists', async () => {
+      const { requireCV } = await import('../src/tools/cv.js');
 
       vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('ENOENT'));
 
-      await expect(requireResume()).rejects.toThrow('No resume found');
+      await expect(requireCV()).rejects.toThrow('No CV found');
     });
   });
 });
@@ -962,10 +962,10 @@ describe('resume tools', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `npx vitest run tests/tools/resume.test.ts`
+Run: `npx vitest run tests/tools/cv.test.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement resume tools**
+- [ ] **Step 3: Implement CV tools**
 
 ```typescript
 import * as fs from 'node:fs/promises';
@@ -973,51 +973,51 @@ import * as path from 'node:path';
 import * as os from 'node:os';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
-const RESUME_DIR = path.join(os.homedir(), '.federal-compass');
-const RESUME_PATH = path.join(RESUME_DIR, 'resume.json');
+const CV_DIR = path.join(os.homedir(), '.federal-compass');
+const CV_PATH = path.join(CV_DIR, 'cv.json');
 
-interface StoredResume {
+interface StoredCV {
   content: string;
   savedAt: string;
   format: string;
 }
 
-export async function handleSaveResume(params: {
+export async function handleSaveCV(params: {
   content: string;
   format?: string;
 }): Promise<CallToolResult> {
-  const resume: StoredResume = {
+  const cv: StoredCV = {
     content: params.content,
     savedAt: new Date().toISOString(),
     format: params.format ?? 'txt',
   };
 
-  await fs.mkdir(RESUME_DIR, { recursive: true });
-  await fs.writeFile(RESUME_PATH, JSON.stringify(resume, null, 2));
+  await fs.mkdir(CV_DIR, { recursive: true });
+  await fs.writeFile(CV_PATH, JSON.stringify(cv, null, 2));
 
   return {
     content: [
       {
         type: 'text',
-        text: `Resume saved successfully (${params.content.length} characters, format: ${resume.format}). It will be used automatically for job matching and qualification checks.`,
+        text: `CV saved successfully (${params.content.length} characters, format: ${cv.format}). It will be used automatically for job matching and qualification checks.`,
       },
     ],
   };
 }
 
-export async function handleGetResume(): Promise<CallToolResult> {
+export async function handleGetCV(): Promise<CallToolResult> {
   try {
-    const raw = await fs.readFile(RESUME_PATH, 'utf-8');
-    const resume: StoredResume = JSON.parse(raw);
+    const raw = await fs.readFile(CV_PATH, 'utf-8');
+    const cv: StoredCV = JSON.parse(raw);
     return {
       content: [
         {
           type: 'text',
           text: JSON.stringify(
             {
-              content: resume.content,
-              savedAt: resume.savedAt,
-              format: resume.format,
+              content: cv.content,
+              savedAt: cv.savedAt,
+              format: cv.format,
             },
             null,
             2,
@@ -1030,20 +1030,20 @@ export async function handleGetResume(): Promise<CallToolResult> {
       content: [
         {
           type: 'text',
-          text: 'No resume saved yet. Use the save_resume tool to save your resume for automatic use in job matching and qualification checks.',
+          text: 'No CV saved yet. Use the save_cv tool to save your CV for automatic use in job matching and qualification checks.',
         },
       ],
     };
   }
 }
 
-export async function requireResume(): Promise<StoredResume> {
+export async function requireCV(): Promise<StoredCV> {
   try {
-    const raw = await fs.readFile(RESUME_PATH, 'utf-8');
+    const raw = await fs.readFile(CV_PATH, 'utf-8');
     return JSON.parse(raw);
   } catch {
     throw new Error(
-      'No resume found. Please save your resume first using the save_resume tool, then try again.',
+      'No CV found. Please save your CV first using the save_cv tool, then try again.',
     );
   }
 }
@@ -1051,7 +1051,7 @@ export async function requireResume(): Promise<StoredResume> {
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `npx vitest run tests/tools/resume.test.ts`
+Run: `npx vitest run tests/tools/cv.test.ts`
 Expected: All 5 tests PASS.
 
 ---
@@ -1433,7 +1433,7 @@ describe('advisor tools', () => {
   });
 
   describe('handleFindMatchingJobs', () => {
-    it('extracts keywords from resume and searches', async () => {
+    it('extracts keywords from CV and searches', async () => {
       const { handleFindMatchingJobs } = await import('../src/tools/advisor.js');
       const { searchJobs } = await import('../src/api/usajobs-client.js');
 
@@ -1459,7 +1459,7 @@ describe('advisor tools', () => {
       expect(searchJobs).toHaveBeenCalled();
     });
 
-    it('returns error when no resume saved', async () => {
+    it('returns error when no CV saved', async () => {
       const { handleFindMatchingJobs } = await import('../src/tools/advisor.js');
 
       vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('ENOENT'));
@@ -1468,12 +1468,12 @@ describe('advisor tools', () => {
       const result = await handleFindMatchingJobs(client, {});
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('No resume found');
+      expect(result.content[0].text).toContain('No CV found');
     });
   });
 
   describe('handleCheckQualification', () => {
-    it('returns resume and job data side by side', async () => {
+    it('returns CV and job data side by side', async () => {
       const { handleCheckQualification } = await import('../src/tools/advisor.js');
       const { searchJobs } = await import('../src/api/usajobs-client.js');
 
@@ -1523,12 +1523,12 @@ describe('advisor tools', () => {
       const result = await handleCheckQualification(client, { job_id: '12345' });
       const parsed = JSON.parse(result.content[0].text);
 
-      expect(parsed.resume).toContain('Senior Developer');
+      expect(parsed.cv).toContain('Senior Developer');
       expect(parsed.job.title).toBe('Software Developer');
       expect(parsed.job.key_requirements).toBeDefined();
     });
 
-    it('returns error when no resume saved', async () => {
+    it('returns error when no CV saved', async () => {
       const { handleCheckQualification } = await import('../src/tools/advisor.js');
 
       vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('ENOENT'));
@@ -1537,7 +1537,7 @@ describe('advisor tools', () => {
       const result = await handleCheckQualification(client, { job_id: '123' });
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('No resume found');
+      expect(result.content[0].text).toContain('No CV found');
     });
   });
 });
@@ -1556,7 +1556,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { searchJobs, type SearchResultItem } from '../api/usajobs-client.js';
 import { getCodelist } from '../cache/codelist-cache.js';
 import { lookupConcept } from '../data/federal-glossary.js';
-import { requireResume } from './resume.js';
+import { requireCV } from './cv.js';
 
 export async function handleExplainConcept(params: {
   concept: string;
@@ -1630,7 +1630,7 @@ export async function handleExplainConcept(params: {
   };
 }
 
-// Known tech keywords for resume extraction
+// Known tech keywords for CV extraction
 const TECH_KEYWORDS = new Set([
   'javascript', 'typescript', 'python', 'java', 'go', 'rust', 'c++', 'c#',
   'react', 'vue', 'angular', 'node.js', 'nodejs', 'express', 'django',
@@ -1643,8 +1643,8 @@ const TECH_KEYWORDS = new Set([
   'system administrator', 'data analyst', 'security analyst',
 ]);
 
-function extractKeywords(resumeText: string): string[] {
-  const lower = resumeText.toLowerCase();
+function extractKeywords(cvText: string): string[] {
+  const lower = cvText.toLowerCase();
   const found: string[] = [];
 
   for (const keyword of TECH_KEYWORDS) {
@@ -1673,9 +1673,9 @@ export async function handleFindMatchingJobs(
   client: AxiosInstance,
   params: { results_per_page?: number },
 ): Promise<CallToolResult> {
-  let resume;
+  let cv;
   try {
-    resume = await requireResume();
+    cv = await requireCV();
   } catch (error) {
     return {
       content: [
@@ -1688,7 +1688,7 @@ export async function handleFindMatchingJobs(
     };
   }
 
-  const keywords = extractKeywords(resume.content);
+  const keywords = extractKeywords(cv.content);
   const resultsPerPage = params.results_per_page ?? 25;
 
   if (keywords.length === 0) {
@@ -1768,9 +1768,9 @@ export async function handleCheckQualification(
   client: AxiosInstance,
   params: { job_id: string },
 ): Promise<CallToolResult> {
-  let resume;
+  let cv;
   try {
-    resume = await requireResume();
+    cv = await requireCV();
   } catch (error) {
     return {
       content: [
@@ -1815,7 +1815,7 @@ export async function handleCheckQualification(
         type: 'text',
         text: JSON.stringify(
           {
-            resume: resume.content,
+            cv: cv.content,
             job: {
               title: d.PositionTitle,
               agency: d.OrganizationName,
@@ -1864,7 +1864,7 @@ import { z } from 'zod';
 import type { AxiosInstance } from 'axios';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { handleSearchJobs, handleGetJobDetails } from './search.js';
-import { handleSaveResume, handleGetResume } from './resume.js';
+import { handleSaveCV, handleGetCV } from './cv.js';
 import {
   handleExplainConcept,
   handleFindMatchingJobs,
@@ -1906,23 +1906,23 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
   );
 
   server.tool(
-    'save_resume',
-    'Save your resume text locally for automatic use in job matching and qualification checks. The resume is stored only on your machine.',
+    'save_cv',
+    'Save your CV text locally for automatic use in job matching and qualification checks. The CV is stored only on your machine.',
     {
-      content: z.string().describe('Resume text content'),
+      content: z.string().describe('CV text content'),
       format: z
         .string()
         .optional()
-        .describe('Original format of the resume: "pdf", "txt", or "md" (default: "txt")'),
+        .describe('Original format of the CV: "pdf", "txt", or "md" (default: "txt")'),
     },
-    async (params) => handleSaveResume(params),
+    async (params) => handleSaveCV(params),
   );
 
   server.tool(
-    'get_resume',
-    'Read your saved resume. Returns the resume text and metadata (when it was saved, original format).',
+    'get_cv',
+    'Read your saved CV. Returns the CV text and metadata (when it was saved, original format).',
     {},
-    async () => handleGetResume(),
+    async () => handleGetCV(),
   );
 
   server.tool(
@@ -1940,7 +1940,7 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
 
   server.tool(
     'find_matching_jobs',
-    'Find federal jobs that match your saved resume. Extracts skills and keywords from your resume and searches USAJobs. Requires a saved resume.',
+    'Find federal jobs that match your saved CV. Extracts skills and keywords from your CV and searches USAJobs. Requires a saved CV.',
     {
       results_per_page: z
         .number()
@@ -1952,7 +1952,7 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
 
   server.tool(
     'check_qualification',
-    'Compare your saved resume against a specific job posting. Returns your resume and the job requirements side by side for analysis. Requires a saved resume.',
+    'Compare your saved CV against a specific job posting. Returns your CV and the job requirements side by side for analysis. Requires a saved CV.',
     {
       job_id: z.string().describe('Job ID (MatchedObjectId from search results)'),
     },
@@ -2076,7 +2076,7 @@ export default {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.skivuha/federal-compass-mcp",
   "title": "Federal Compass MCP",
-  "description": "Your AI compass from private sector to federal career — search USAJobs, explain federal concepts, analyze resumes",
+  "description": "Your AI compass from private sector to federal career — search USAJobs, explain federal concepts, analyze CVs",
   "repository": {
     "url": "https://github.com/skivuha/federal-compass-mcp",
     "source": "github"

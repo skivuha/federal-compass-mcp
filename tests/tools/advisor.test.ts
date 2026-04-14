@@ -78,7 +78,7 @@ describe('advisor tools', () => {
   });
 
   describe('handleFindMatchingJobs', () => {
-    it('extracts keywords from resume and searches', async () => {
+    it('extracts keywords from CV and searches', async () => {
       const { handleFindMatchingJobs } = await import('../../src/tools/advisor.js');
       const { searchJobs } = await import('../../src/api/usajobs-client.js');
 
@@ -103,7 +103,7 @@ describe('advisor tools', () => {
       expect(searchJobs).toHaveBeenCalled();
     });
 
-    it('returns error when no resume saved', async () => {
+    it('returns error when no CV saved', async () => {
       const { handleFindMatchingJobs } = await import('../../src/tools/advisor.js');
 
       vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('ENOENT'));
@@ -112,12 +112,12 @@ describe('advisor tools', () => {
       const result = await handleFindMatchingJobs(client, {});
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('No resume found');
+      expect(result.content[0].text).toContain('No CV found');
     });
   });
 
   describe('handleCheckQualification', () => {
-    it('returns resume and job data side by side', async () => {
+    it('returns CV and job data side by side', async () => {
       const { handleCheckQualification } = await import('../../src/tools/advisor.js');
       const { searchJobs } = await import('../../src/api/usajobs-client.js');
 
@@ -137,12 +137,12 @@ describe('advisor tools', () => {
       const result = await handleCheckQualification(client, { job_id: '12345' });
       const parsed = JSON.parse(result.content[0].text);
 
-      expect(parsed.resume).toContain('Senior Developer');
+      expect(parsed.cv).toContain('Senior Developer');
       expect(parsed.job.title).toBe('Software Developer');
       expect(parsed.job.key_requirements).toBeDefined();
     });
 
-    it('returns error when no resume saved', async () => {
+    it('returns error when no CV saved', async () => {
       const { handleCheckQualification } = await import('../../src/tools/advisor.js');
 
       vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('ENOENT'));
@@ -151,7 +151,7 @@ describe('advisor tools', () => {
       const result = await handleCheckQualification(client, { job_id: '123' });
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('No resume found');
+      expect(result.content[0].text).toContain('No CV found');
     });
   });
 });

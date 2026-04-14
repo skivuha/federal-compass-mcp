@@ -3,7 +3,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { searchJobs, type SearchResultItem } from '../api/usajobs-client.js';
 import { getCodelist } from '../cache/codelist-cache.js';
 import { lookupConcept } from '../data/federal-glossary.js';
-import { requireResume } from './resume.js';
+import { requireCV } from './cv.js';
 
 export async function handleExplainConcept(params: {
   concept: string;
@@ -77,7 +77,7 @@ export async function handleExplainConcept(params: {
   };
 }
 
-// Known tech keywords for resume extraction
+// Known tech keywords for CV extraction
 const TECH_KEYWORDS = new Set([
   'javascript', 'typescript', 'python', 'java', 'go', 'rust', 'c++', 'c#',
   'react', 'vue', 'angular', 'node.js', 'nodejs', 'express', 'django',
@@ -90,8 +90,8 @@ const TECH_KEYWORDS = new Set([
   'system administrator', 'data analyst', 'security analyst',
 ]);
 
-function extractKeywords(resumeText: string): string[] {
-  const lower = resumeText.toLowerCase();
+function extractKeywords(cvText: string): string[] {
+  const lower = cvText.toLowerCase();
   const found: string[] = [];
 
   for (const keyword of TECH_KEYWORDS) {
@@ -120,9 +120,9 @@ export async function handleFindMatchingJobs(
   client: AxiosInstance,
   params: { results_per_page?: number },
 ): Promise<CallToolResult> {
-  let resume;
+  let cv;
   try {
-    resume = await requireResume();
+    cv = await requireCV();
   } catch (error) {
     return {
       content: [{ type: 'text', text: (error as Error).message }],
@@ -130,7 +130,7 @@ export async function handleFindMatchingJobs(
     };
   }
 
-  const keywords = extractKeywords(resume.content);
+  const keywords = extractKeywords(cv.content);
   const resultsPerPage = params.results_per_page ?? 25;
 
   if (keywords.length === 0) {
@@ -209,9 +209,9 @@ export async function handleCheckQualification(
   client: AxiosInstance,
   params: { job_id: string },
 ): Promise<CallToolResult> {
-  let resume;
+  let cv;
   try {
-    resume = await requireResume();
+    cv = await requireCV();
   } catch (error) {
     return {
       content: [{ type: 'text', text: (error as Error).message }],
@@ -258,7 +258,7 @@ export async function handleCheckQualification(
         type: 'text',
         text: JSON.stringify(
           {
-            resume: resume.content,
+            cv: cv.content,
             job: {
               title: d.PositionTitle,
               agency: d.OrganizationName,

@@ -4,7 +4,7 @@
 
 ## Overview
 
-MCP server that helps tech professionals transition from private sector to federal/government careers. Connects any MCP-compatible AI client to the official USAJobs API, translates federal jargon into plain language, and analyzes resumes against job postings.
+MCP server that helps tech professionals transition from private sector to federal/government careers. Connects any MCP-compatible AI client to the official USAJobs API, translates federal jargon into plain language, and analyzes CVs against job postings.
 
 **Not a wrapper** — an advisor. The server provides structured data that enables any LLM to explain GS grades, compare qualifications, and recommend matching jobs.
 
@@ -160,21 +160,21 @@ get_job_details({
 - Queries `/api/search` filtering by ControlNumber (exact parameter TBD — needs testing)
 - Returns full object: MajorDuties, QualificationSummary, SecurityClearance, HiringPath, TeleworkEligible, RemoteIndicator, ApplyURI, salary range, grade range
 
-### 3. `save_resume`
+### 3. `save_cv`
 
-Save resume text locally.
+Save CV text locally.
 
 ```typescript
-save_resume({
-  content: string,    // resume text (client extracts from PDF/DOCX)
+save_cv({
+  content: string,    // CV text (client extracts from PDF/DOCX)
   format?: string     // "pdf" | "txt" | "md" — metadata only, default "txt"
 })
 ```
 
 **Behavior:**
-- Writes `~/.federal-compass/resume.json`
+- Writes `~/.federal-compass/cv.json`
 - Creates directory if not exists
-- Overwrites previous resume without confirmation
+- Overwrites previous CV without confirmation
 - File format:
   ```json
   {
@@ -184,20 +184,20 @@ save_resume({
   }
   ```
 
-### 4. `get_resume`
+### 4. `get_cv`
 
-Read saved resume.
+Read saved CV.
 
 ```typescript
-get_resume({})  // no parameters
+get_cv({})  // no parameters
 ```
 
 **Behavior:**
-- Reads `~/.federal-compass/resume.json`
+- Reads `~/.federal-compass/cv.json`
 - Returns content + metadata
-- If no resume saved → `"No resume saved yet."` (informational, not error)
+- If no CV saved → `"No CV saved yet."` (informational, not error)
 
-**Backlog:** Add MCP resource `resume://local` as alternative access method.
+**Backlog:** Add MCP resource `cv://local` as alternative access method.
 
 ### 5. `explain_federal_concept`
 
@@ -217,7 +217,7 @@ explain_federal_concept({
 
 ### 6. `find_matching_jobs`
 
-Find jobs matching the saved resume.
+Find jobs matching the saved CV.
 
 ```typescript
 find_matching_jobs({
@@ -226,15 +226,15 @@ find_matching_jobs({
 ```
 
 **Behavior:**
-- Reads resume from `~/.federal-compass/resume.json`
-- If no resume → error: `"No resume found. Please save your resume first using the save_resume tool, then try again."`
-- Extracts keywords/skills from resume (rule-based, not AI — regex on sections like "Skills:", "Technologies:")
+- Reads CV from `~/.federal-compass/cv.json`
+- If no CV → error: `"No CV found. Please save your CV first using the save_cv tool, then try again."`
+- Extracts keywords/skills from CV (rule-based, not AI — regex on sections like "Skills:", "Technologies:")
 - Makes 1-3 search queries to USAJobs API with different keyword combinations
 - Returns combined list of jobs + which keywords were used for search
 
 ### 7. `check_qualification`
 
-Compare resume against a specific job posting.
+Compare CV against a specific job posting.
 
 ```typescript
 check_qualification({
@@ -243,11 +243,11 @@ check_qualification({
 ```
 
 **Behavior:**
-- Reads resume from `~/.federal-compass/resume.json`
-- If no resume → error: `"No resume found. Please save your resume first using the save_resume tool, then try again."`
+- Reads CV from `~/.federal-compass/cv.json`
+- If no CV → error: `"No CV found. Please save your CV first using the save_cv tool, then try again."`
 - Fetches job details via `get_job_details`
-- Returns both texts side by side: resume + job requirements (QualificationSummary, MajorDuties, SecurityClearance, grade range)
-- Structured as `{ resume, job, key_requirements: [...] }` so any LLM can easily compare
+- Returns both texts side by side: CV + job requirements (QualificationSummary, MajorDuties, SecurityClearance, grade range)
+- Structured as `{ cv, job, key_requirements: [...] }` so any LLM can easily compare
 - Does NOT analyze — prepares data for client-side LLM analysis
 
 ---
@@ -259,7 +259,7 @@ federal-compass-mcp/
   src/
     tools/
       search.ts              ← search_jobs, get_job_details
-      resume.ts              ← save_resume, get_resume
+      cv.ts                  ← save_cv, get_cv
       advisor.ts             ← explain_federal_concept, find_matching_jobs, check_qualification
       tools.ts               ← collects all tools, exports array
     api/
@@ -361,14 +361,14 @@ Hardcoded reference data, updated manually at release time.
 
 ---
 
-## Resume Storage
+## CV Storage
 
-**Location:** `~/.federal-compass/resume.json`
+**Location:** `~/.federal-compass/cv.json`
 
-- `save_resume` creates directory if not exists, writes JSON file
-- `get_resume` reads file, returns content + metadata
-- `find_matching_jobs` and `check_qualification` require resume — return clear error if not found: `"No resume found. Please save your resume first using the save_resume tool, then try again."`
-- `search_jobs`, `get_job_details`, `explain_federal_concept` work without resume
+- `save_cv` creates directory if not exists, writes JSON file
+- `get_cv` reads file, returns content + metadata
+- `find_matching_jobs` and `check_qualification` require CV — return clear error if not found: `"No CV found. Please save your CV first using the save_cv tool, then try again."`
+- `search_jobs`, `get_job_details`, `explain_federal_concept` work without CV
 
 ---
 
@@ -378,7 +378,7 @@ Hardcoded reference data, updated manually at release time.
 
 - Missing env variables → stderr error + exit(1) at startup
 - API errors (4xx, 5xx, timeout) → clear text message returned as tool response
-- Missing resume (for tools that require it) → clear text message with instructions
+- Missing CV (for tools that require it) → clear text message with instructions
 - Concept not found in glossary → fallback to codelist data, then informational message
 - Codelist fetch failure → clear message, tool still tries to work without the codelist if possible
 
@@ -413,11 +413,11 @@ Hardcoded reference data, updated manually at release time.
 ```
 Find me senior software developer jobs in Raleigh, NC
 What is a GS-13 and how much does it pay?
-Save my resume [attach file]
+Save my CV [attach file]
 Look at this job posting — am I qualified?
 Find jobs where no clearance is needed
 Which agencies hire Vue/React developers?
-Look at my resume — what federal jobs am I a good fit for?
+Look at my CV — what federal jobs am I a good fit for?
 Explain what TS/SCI means and whether I need it
 ```
 
@@ -429,8 +429,8 @@ Explain what TS/SCI means and whether I need it
 |----------|--------|--------|
 | API key storage | env variables only | Standard for MCP servers, simpler and safer |
 | `get_job_details` | Separate tool, search by ControlNumber | User may return to a job in new conversation |
-| `save_resume` format | JSON with content + metadata | Richer than plain text, no PDF parsing needed |
-| `get_resume` | Tool only, not MCP resource | Not all clients support resources. Resource in backlog |
+| `save_cv` format | JSON with content + metadata | Richer than plain text, no PDF parsing needed |
+| `get_cv` | Tool only, not MCP resource | Not all clients support resources. Resource in backlog |
 | `explain_federal_concept` | Tool + built-in glossary | Core value prop. Claude alone may have stale data |
 | Glossary GS pay data | Hardcoded, updated at release | Changes once/year by 2-4%, OPM source |
 | `translate_job_posting` | Removed | Any LLM can do this with data from get_job_details |

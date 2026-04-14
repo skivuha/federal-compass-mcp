@@ -16,9 +16,9 @@ Built for tech professionals transitioning from private sector to federal/govern
 
 - **Searches** federal job openings with optional filters — keyword, location, salary, clearance level
 - **Translates** federal job descriptions into plain language — what they actually want, without the jargon
-- **Analyzes** your resume against specific job postings and tells you if you qualify
+- **Analyzes** your CV against specific job postings and tells you if you qualify
 - **Explains** federal concepts — GS grades, pay plans, security clearances, hiring paths
-- **Saves** your resume locally so Claude can reference it automatically
+- **Saves** your CV locally so Claude can reference it automatically
 
 ---
 
@@ -60,7 +60,7 @@ What is a GS-13 and how much does it pay?
 ```
 
 ```
-Save my resume [attach file]
+Save my CV [attach file]
 ```
 
 ```
@@ -75,20 +75,21 @@ Look at this job posting — am I qualified?
 |------|-------------|
 | `search_jobs` | Search federal job openings. All filters optional — keyword, location, salary, grade, agency, remote |
 | `get_job_details` | Get full details for a specific job posting |
-| `translate_job_posting` | Explain a federal JD in plain language — what they really want |
-| `am_i_qualified` | Compare your saved resume against a job posting |
+| `save_cv` | Save your CV locally for automatic use in analysis |
+| `get_cv` | Read your saved CV |
 | `explain_federal_concept` | Explain GS grades, clearances, hiring paths, pay plans |
-| `save_resume` | Save your resume locally for automatic use in analysis |
+| `find_matching_jobs` | Find jobs matching your CV — extracts skills and searches USAJobs |
+| `check_qualification` | Compare your CV against a specific job posting |
 
 ---
 
-## Resume storage
+## CV storage
 
-Your resume is stored locally on your machine — never sent to any server:
+Your CV is stored locally on your machine — never sent to any server:
 
 ```
 ~/.federal-compass/
-  resume.pdf
+  cv.json
   config.json
   codelists/     <- cached USAJobs reference data
 ```
