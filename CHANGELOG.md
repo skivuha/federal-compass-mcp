@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.3...federal-compass-mcp-v0.1.4) (2026-04-15)
+
+
+### Features
+
+* add calculate_salary tool with locality pay adjustment ([#18](https://github.com/skivuha/federal-compass-mcp/issues/18)) ([5558a0c](https://github.com/skivuha/federal-compass-mcp/commit/5558a0c701eb98226730bcf12715890dd2f476dd))
+
 ## [0.1.3](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.2...federal-compass-mcp-v0.1.3) (2026-04-15)
 
 
