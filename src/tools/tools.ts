@@ -4,6 +4,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { handleSearchJobs, handleGetJobDetails, handleCompareJobs } from './search.js';
 import { handleSaveCV, handleGetCV } from './cv.js';
 import { handleCalculateSalary } from './salary.js';
+import { handleExtractKsa } from './ksa.js';
 import {
   handleExplainConcept,
   handleFindMatchingJobs,
@@ -101,5 +102,14 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
       location: z.string().optional().describe('Location for locality pay: "Raleigh", "DC", "NYC", "San Francisco". Defaults to Rest of US.'),
     },
     async (params) => handleCalculateSalary(params),
+  );
+
+  server.tool(
+    'extract_ksa',
+    'Extract KSA (Knowledge, Skills, Abilities) requirements from a federal job posting. Categorizes requirements by type and optionally matches them against your saved CV. Returns structured requirements with match status.',
+    {
+      job_id: z.string().describe('Job ID (MatchedObjectId from search results)'),
+    },
+    async (params) => handleExtractKsa(client, params),
   );
 }
