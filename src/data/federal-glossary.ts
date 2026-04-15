@@ -17,7 +17,7 @@ export interface GlossaryEntry {
 // GS pay table 2026 — source: OPM Salary Table 2026-GS
 // Incorporating the 1% General Schedule Increase, Effective January 2026
 // https://www.opm.gov/policy-data-oversight/pay-leave/salaries-wages/salary-tables/pdf/2026/GS.pdf
-const GS_STEPS: Record<string, number[]> = {
+export const GS_STEPS: Record<string, number[]> = {
   '1':  [22584, 23341, 24092, 24840, 25589, 26028, 26771, 27519, 27550, 28248],
   '2':  [25393, 25997, 26839, 27550, 27858, 28677, 29496, 30315, 31134, 31953],
   '3':  [27708, 28632, 29556, 30480, 31404, 32328, 33252, 34176, 35100, 36024],
