@@ -7,13 +7,13 @@
     "url": "https://github.com/skivuha/federal-compass-mcp",
     "source": "github"
   },
-  "version": "0.1.0",
+  "version": "0.1.5",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "federal-compass-mcp",
-      "version": "0.1.0",
+      "version": "0.1.5",
       "transport": {
         "type": "stdio"
       },
