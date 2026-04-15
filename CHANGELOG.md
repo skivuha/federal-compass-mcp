@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.2...federal-compass-mcp-v0.1.3) (2026-04-15)
+
+
+### Bug Fixes
+
+* update GS pay table with actual 2026 OPM data ([#7](https://github.com/skivuha/federal-compass-mcp/issues/7)) ([88f25de](https://github.com/skivuha/federal-compass-mcp/commit/88f25dec84d4374913bc3b01f9dfff49a77e546c))
+
 ## [0.1.2](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.1...federal-compass-mcp-v0.1.2) (2026-04-15)
 
 
