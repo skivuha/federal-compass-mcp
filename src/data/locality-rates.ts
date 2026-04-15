@@ -98,7 +98,7 @@ const REST_OF_US: LocalityMatch = { ...REST_OF_US_ENTRY, fallback: true };
 export function findLocalityArea(query: string): LocalityMatch {
   const trimmed = query.trim().toLowerCase();
 
-  if (trimmed === '') return REST_OF_US;
+  if (trimmed === '') return { ...REST_OF_US_ENTRY };
 
   // Check aliases first
   const aliasTarget = ALIASES[trimmed];

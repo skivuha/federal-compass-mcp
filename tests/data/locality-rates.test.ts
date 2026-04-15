@@ -42,9 +42,10 @@ describe('locality-rates', () => {
     expect(result.fallback).toBe(true);
   });
 
-  it('falls back to Rest of US for empty string', () => {
+  it('returns Rest of US without fallback flag for empty string', () => {
     const result = findLocalityArea('');
     expect(result.name).toBe('Rest of US');
+    expect(result.fallback).toBeUndefined();
   });
 
   it('matches by token overlap', () => {
