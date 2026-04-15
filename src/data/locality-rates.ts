@@ -109,11 +109,13 @@ export function findLocalityArea(query: string): LocalityMatch {
     if (match) return { ...match };
   }
 
-  // Substring match
-  const substringMatch = LOCALITY_AREAS.find((area) =>
-    area.name.toLowerCase().includes(trimmed),
-  );
-  if (substringMatch) return { ...substringMatch };
+  // Substring match (skip for short queries to avoid ambiguous matches like "ny" → Albany)
+  if (trimmed.length >= 3) {
+    const substringMatch = LOCALITY_AREAS.find((area) =>
+      area.name.toLowerCase().includes(trimmed),
+    );
+    if (substringMatch) return { ...substringMatch };
+  }
 
   // Token overlap
   const queryTokens = trimmed.split(/[\s,\-]+/).filter((token) => token.length > 2);
