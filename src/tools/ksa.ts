@@ -38,7 +38,7 @@ const STOP_WORDS = new Set([
 
 function splitIntoSentences(text: string): string[] {
   return text
-    .split(/[.;]\s+/)
+    .split(/[.;]\s*/)
     .map((sentence) => sentence.trim())
     .filter((sentence) => sentence.length > 3);
 }
@@ -73,25 +73,28 @@ export function parseKsaRequirements(
 function deduplicateRequirements(requirements: KsaRequirement[]): KsaRequirement[] {
   const seen = new Set<string>();
   return requirements.filter((requirement) => {
-    const normalized = requirement.text.toLowerCase().trim();
-    if (seen.has(normalized)) return false;
-    seen.add(normalized);
+    const dedupeKey = `${requirement.text.toLowerCase().trim()}::${requirement.source}`;
+    if (seen.has(dedupeKey)) return false;
+    seen.add(dedupeKey);
     return true;
   });
 }
 
 function extractMeaningfulWords(text: string): string[] {
-  return text
-    .toLowerCase()
-    .split(/[\s,\-/()]+/)
-    .filter((word) => word.length >= 3 && !STOP_WORDS.has(word));
+  return [...new Set(
+    text
+      .toLowerCase()
+      .split(/[\s,.\-:/()]+/)
+      .map((word) => word.replace(/^\W+|\W+$/g, ''))
+      .filter((word) => word.length >= 3 && !STOP_WORDS.has(word)),
+  )];
 }
 
 function matchRequirementToCV(requirement: KsaRequirement, cvContent: string): boolean {
   const words = extractMeaningfulWords(requirement.text);
   if (words.length === 0) return false;
-  const cvLower = cvContent.toLowerCase();
-  const matchedCount = words.filter((word) => cvLower.includes(word)).length;
+  const cvWords = new Set(extractMeaningfulWords(cvContent));
+  const matchedCount = words.filter((word) => cvWords.has(word)).length;
   return matchedCount / words.length >= 0.5;
 }
 
