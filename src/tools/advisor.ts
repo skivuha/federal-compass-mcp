@@ -3,7 +3,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { searchJobs, type SearchResultItem } from '../api/usajobs-client.js';
 import { getCodelist } from '../cache/codelist-cache.js';
 import { lookupConcept } from '../data/federal-glossary.js';
-import { JOB_LOOKUP_PAGE_SIZE } from './search.js';
+import { JOB_LOOKUP_PAGE_SIZE, formatJob } from './search.js';
 import { requireCV } from './cv.js';
 
 export async function handleExplainConcept(params: {
@@ -170,23 +170,7 @@ export async function handleFindMatchingJobs(
     }
   }
 
-  const formatted = allResults.map((item) => {
-    const d = item.MatchedObjectDescriptor;
-    const details = d.UserArea.Details;
-    const pay = d.PositionRemuneration[0];
-    return {
-      job_id: item.MatchedObjectId,
-      title: d.PositionTitle,
-      agency: d.OrganizationName,
-      location: d.PositionLocationDisplay,
-      salary_min: pay ? Number(pay.MinimumRange) : null,
-      salary_max: pay ? Number(pay.MaximumRange) : null,
-      grade_range: `${details.LowGrade}-${details.HighGrade}`,
-      security_clearance: details.SecurityClearance,
-      close_date: d.ApplicationCloseDate,
-      apply_url: d.ApplyURI[0] ?? d.PositionURI,
-    };
-  });
+  const formatted = allResults.map(formatJob);
 
   return {
     content: [

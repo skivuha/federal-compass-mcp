@@ -18,7 +18,7 @@ interface SearchJobsParams {
   results_per_page?: number;
 }
 
-function formatJob(item: SearchResultItem) {
+export function formatJob(item: SearchResultItem) {
   const d = item.MatchedObjectDescriptor;
   const details = d.UserArea.Details;
   const pay = d.PositionRemuneration[0];
