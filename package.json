@@ -35,7 +35,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/skivuha/federal-compass-mcp"
+    "url": "git+https://github.com/skivuha/federal-compass-mcp.git"
+  },
+  "homepage": "https://github.com/skivuha/federal-compass-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/skivuha/federal-compass-mcp/issues"
   },
   "author": "Igor Danylov",
   "license": "MIT",
