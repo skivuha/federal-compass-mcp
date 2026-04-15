@@ -49,7 +49,7 @@ describe('locality-rates', () => {
   });
 
   it('matches by token overlap', () => {
-    const result = findLocalityArea('San Francisco');
-    expect(result.name).toContain('San Jose-San Francisco');
+    const result = findLocalityArea('Oakland Jose');
+    expect(result.name).toContain('San Jose-San Francisco-Oakland');
   });
 });
