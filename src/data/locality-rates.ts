@@ -92,11 +92,8 @@ const ALIASES: Record<string, string> = {
   hawaii: 'state of hawaii',
 };
 
-const REST_OF_US: LocalityMatch = {
-  name: 'Rest of US',
-  percentage: 17.06,
-  fallback: true,
-};
+const REST_OF_US_ENTRY = LOCALITY_AREAS.find((area) => area.name === 'Rest of US')!;
+const REST_OF_US: LocalityMatch = { ...REST_OF_US_ENTRY, fallback: true };
 
 export function findLocalityArea(query: string): LocalityMatch {
   const trimmed = query.trim().toLowerCase();

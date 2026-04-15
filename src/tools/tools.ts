@@ -97,7 +97,7 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
     'Calculate federal GS salary with locality pay adjustment. Returns base pay plus locality-adjusted pay for a specific grade, step, and location. Covers all 15 GS grades and ~58 locality pay areas.',
     {
       grade: z.string().describe('GS grade: "13" or "GS-13"'),
-      step: z.number().min(1).max(10).optional().describe('Step 1-10. Omit to see all 10 steps.'),
+      step: z.number().int().min(1).max(10).optional().describe('Step 1-10. Omit to see all 10 steps.'),
       location: z.string().optional().describe('Location for locality pay: "Raleigh", "DC", "NYC", "San Francisco". Defaults to Rest of US.'),
     },
     async (params) => handleCalculateSalary(params),

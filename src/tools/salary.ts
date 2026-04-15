@@ -9,7 +9,11 @@ interface CalculateSalaryParams {
 }
 
 function normalizeGrade(grade: string): string {
-  return grade.replace(/^gs[- ]?/i, '').trim();
+  const normalized = grade.replace(/^gs[- ]?/i, '').trim();
+  if (/^\d+$/.test(normalized)) {
+    return String(Number.parseInt(normalized, 10));
+  }
+  return normalized;
 }
 
 function calculateAdjustedPay(basePay: number, localityPercentage: number): number {
@@ -56,6 +60,17 @@ export function handleCalculateSalary(params: CalculateSalaryParams): CallToolRe
   const note = fallbackNote ?? baseNote;
 
   if (params.step !== undefined) {
+    if (!Number.isInteger(params.step) || params.step < 1 || params.step > 10) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Step must be an integer between 1 and 10. Got: ${params.step}.`,
+          },
+        ],
+        isError: true,
+      };
+    }
     const stepIndex = params.step - 1;
     const basePay = steps[stepIndex];
 
