@@ -1,6 +1,6 @@
 {
   "name": "federal-compass-mcp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Your AI compass from private sector to federal career — MCP server for USAJobs API",
   "type": "module",
   "bin": {
