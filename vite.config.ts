@@ -8,7 +8,7 @@ export default defineConfig({
       fileName: 'index',
     },
     outDir: 'dist',
-    target: 'node20',
+    target: 'node22',
     ssr: true,
     rollupOptions: {
       external: [/^node:/, /^@modelcontextprotocol/, /^axios/, /^debug/, /^zod/],
