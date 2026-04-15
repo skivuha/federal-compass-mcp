@@ -67,6 +67,9 @@ describe('advisor tools', () => {
 
       expect(text).toContain('General Schedule');
       expect(text).toContain('13');
+      expect(text).toContain('All Steps');
+      expect(text).toContain('$90,925');
+      expect(text).toContain('$118,204');
     });
 
     it('falls back to codelist for unknown glossary entry', async () => {

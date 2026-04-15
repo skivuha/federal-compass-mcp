@@ -2,6 +2,7 @@ export interface GradeDetail {
   grade: string;
   min: number;
   max: number;
+  steps: number[];
 }
 
 export interface GlossaryEntry {
@@ -13,25 +14,25 @@ export interface GlossaryEntry {
   details?: Record<string, string | number>;
 }
 
-// GS pay table 2026 — source: OPM General Schedule pay tables
-// Using Step 1 (min) and Step 10 (max) for base pay
-// TODO: Update with actual 2026 OPM data at implementation time
-const GS_PAY_TABLE: Record<string, { min: number; max: number }> = {
-  '1': { min: 21986, max: 27487 },
-  '2': { min: 24722, max: 31177 },
-  '3': { min: 26974, max: 35065 },
-  '4': { min: 30280, max: 39361 },
-  '5': { min: 33878, max: 44042 },
-  '6': { min: 37774, max: 49107 },
-  '7': { min: 41925, max: 54504 },
-  '8': { min: 46340, max: 60243 },
-  '9': { min: 51054, max: 66370 },
-  '10': { min: 56233, max: 73101 },
-  '11': { min: 61727, max: 80244 },
-  '12': { min: 73969, max: 96161 },
-  '13': { min: 87971, max: 114358 },
-  '14': { min: 103945, max: 135125 },
-  '15': { min: 122290, max: 156755 },
+// GS pay table 2026 — source: OPM Salary Table 2026-GS
+// Incorporating the 1% General Schedule Increase, Effective January 2026
+// https://www.opm.gov/policy-data-oversight/pay-leave/salaries-wages/salary-tables/pdf/2026/GS.pdf
+const GS_STEPS: Record<string, number[]> = {
+  '1':  [22584, 23341, 24092, 24840, 25589, 26028, 26771, 27519, 27550, 28248],
+  '2':  [25393, 25997, 26839, 27550, 27858, 28677, 29496, 30315, 31134, 31953],
+  '3':  [27708, 28632, 29556, 30480, 31404, 32328, 33252, 34176, 35100, 36024],
+  '4':  [31103, 32140, 33177, 34214, 35251, 36288, 37325, 38362, 39399, 40436],
+  '5':  [34799, 35959, 37119, 38279, 39439, 40599, 41759, 42919, 44079, 45239],
+  '6':  [38791, 40084, 41377, 42670, 43963, 45256, 46549, 47842, 49135, 50428],
+  '7':  [43106, 44543, 45980, 47417, 48854, 50291, 51728, 53165, 54602, 56039],
+  '8':  [47738, 49329, 50920, 52511, 54102, 55693, 57284, 58875, 60466, 62057],
+  '9':  [52727, 54485, 56243, 58001, 59759, 61517, 63275, 65033, 66791, 68549],
+  '10': [58064, 59999, 61934, 63869, 65804, 67739, 69674, 71609, 73544, 75479],
+  '11': [63795, 65922, 68049, 70176, 72303, 74430, 76557, 78684, 80811, 82938],
+  '12': [76463, 79012, 81561, 84110, 86659, 89208, 91757, 94306, 96855, 99404],
+  '13': [90925, 93956, 96987, 100018, 103049, 106080, 109111, 112142, 115173, 118204],
+  '14': [107446, 111028, 114610, 118192, 121774, 125356, 128938, 132520, 136102, 139684],
+  '15': [126384, 130597, 134810, 139023, 143236, 147449, 151662, 155875, 160088, 164301],
 };
 
 interface RawGlossaryEntry {
@@ -128,13 +129,13 @@ export function lookupConcept(query: string): GlossaryEntry | undefined {
   const gsMatch = normalized.match(/^GS[- ]?(\d{1,2})$/);
   if (gsMatch) {
     const grade = gsMatch[1];
-    const payRange = GS_PAY_TABLE[grade];
+    const steps = GS_STEPS[grade];
     const gsEntry = GLOSSARY['GS'];
-    if (gsEntry && payRange) {
+    if (gsEntry && steps) {
       return {
         title: `${gsEntry.title} — Grade ${grade}`,
         description: gsEntry.description,
-        gradeDetail: { grade, min: payRange.min, max: payRange.max },
+        gradeDetail: { grade, min: steps[0], max: steps[steps.length - 1], steps },
         related: gsEntry.related,
       };
     }
@@ -150,8 +151,8 @@ export function lookupConcept(query: string): GlossaryEntry | undefined {
       return {
         ...entry,
         details: {
-          lowestGrade1Min: GS_PAY_TABLE['1'].min,
-          highestGrade15Max: GS_PAY_TABLE['15'].max,
+          lowestGrade1Min: GS_STEPS['1'][0],
+          highestGrade15Max: GS_STEPS['15'][GS_STEPS['15'].length - 1],
           totalGrades: 15,
           stepsPerGrade: 10,
         },
