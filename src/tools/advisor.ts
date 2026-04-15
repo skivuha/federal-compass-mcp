@@ -16,10 +16,10 @@ export async function handleExplainConcept(params: {
 
     if (entry.gradeDetail) {
       parts.push(
-        `\n**Grade ${entry.gradeDetail.grade} Pay Range:** $${entry.gradeDetail.min.toLocaleString()} — $${entry.gradeDetail.max.toLocaleString()} (base pay, before locality adjustment)`,
+        `\n**Grade ${entry.gradeDetail.grade} Pay Range:** $${entry.gradeDetail.min.toLocaleString('en-US')} — $${entry.gradeDetail.max.toLocaleString('en-US')} (base pay, before locality adjustment)`,
       );
       const stepsFormatted = entry.gradeDetail.steps
-        .map((s, i) => `Step ${i + 1}: $${s.toLocaleString()}`)
+        .map((s, i) => `Step ${i + 1}: $${s.toLocaleString('en-US')}`)
         .join(', ');
       parts.push(`\n**All Steps:** ${stepsFormatted}`);
     }
@@ -246,7 +246,7 @@ export async function handleCheckQualification(
               agency: d.OrganizationName,
               location: d.PositionLocationDisplay,
               salary_range: pay
-                ? `$${Number(pay.MinimumRange).toLocaleString()} — $${Number(pay.MaximumRange).toLocaleString()}`
+                ? `$${Number(pay.MinimumRange).toLocaleString('en-US')} — $${Number(pay.MaximumRange).toLocaleString('en-US')}`
                 : 'Not specified',
               grade_range: `${details.LowGrade}-${details.HighGrade}`,
               security_clearance: details.SecurityClearance,
