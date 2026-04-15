@@ -214,7 +214,7 @@ export async function handleCompareJobs(
       content: [
         {
           type: 'text',
-          text: `None of the requested jobs could be found.${details.length > 0 ? ` ${details.join('. ')}.` : ''}`,
+          text: `None of the requested jobs could be found or retrieved.${details.length > 0 ? ` ${details.join('. ')}.` : ''}`,
         },
       ],
       isError: true,
