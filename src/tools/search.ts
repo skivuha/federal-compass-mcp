@@ -3,6 +3,8 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { searchJobs, type SearchParams, type SearchResultItem } from '../api/usajobs-client.js';
 import { resolveCode } from '../cache/codelist-cache.js';
 
+export const JOB_LOOKUP_PAGE_SIZE = 10;
+
 interface SearchJobsParams {
   keyword?: string;
   location?: string;
@@ -120,7 +122,7 @@ export async function handleGetJobDetails(
   try {
     searchResult = await searchJobs(client, {
       Keyword: params.job_id,
-      ResultsPerPage: 10,
+      ResultsPerPage: JOB_LOOKUP_PAGE_SIZE,
     });
   } catch {
     return {

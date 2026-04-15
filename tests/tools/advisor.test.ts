@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fs from 'node:fs/promises';
+import { JOB_LOOKUP_PAGE_SIZE } from '../../src/tools/search.js';
 
 vi.mock('node:fs/promises');
 vi.mock('../../src/api/usajobs-client.js', () => ({
@@ -138,7 +139,7 @@ describe('advisor tools', () => {
 
       expect(searchJobs).toHaveBeenCalledWith(
         client,
-        expect.objectContaining({ Keyword: '12345', ResultsPerPage: 10 }),
+        expect.objectContaining({ Keyword: '12345', ResultsPerPage: JOB_LOOKUP_PAGE_SIZE }),
       );
 
       const parsed = JSON.parse(result.content[0].text);
