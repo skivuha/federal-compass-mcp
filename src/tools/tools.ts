@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { AxiosInstance } from 'axios';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { handleSearchJobs, handleGetJobDetails } from './search.js';
+import { handleSearchJobs, handleGetJobDetails, handleCompareJobs } from './search.js';
 import { handleSaveCV, handleGetCV } from './cv.js';
 import {
   handleExplainConcept,
@@ -79,5 +79,15 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
       job_id: z.string().describe('Job ID (MatchedObjectId from search results)'),
     },
     async (params) => handleCheckQualification(client, params),
+  );
+
+  server.tool(
+    'compare_jobs',
+    'Compare 2-5 federal job postings side by side. Returns salary, grade, clearance, location, and more for each job. Makes one API call per job.',
+    {
+      job_ids: z.array(z.string()).describe('Array of 2-5 job IDs (MatchedObjectId from search results)'),
+      include_details: z.boolean().optional().describe('Include duties, qualifications, and job summary (default: false)'),
+    },
+    async (params) => handleCompareJobs(client, params),
   );
 }

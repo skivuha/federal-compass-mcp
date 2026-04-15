@@ -43,7 +43,7 @@ export function formatJob(item: SearchResultItem) {
   };
 }
 
-function formatJobFull(item: SearchResultItem) {
+export function formatJobFull(item: SearchResultItem) {
   const d = item.MatchedObjectDescriptor;
   const details = d.UserArea.Details;
   return {
@@ -52,6 +52,19 @@ function formatJobFull(item: SearchResultItem) {
     major_duties: details.MajorDuties,
     qualification_summary: d.QualificationSummary,
   };
+}
+
+export async function lookupJobById(
+  client: AxiosInstance,
+  jobId: string,
+): Promise<SearchResultItem | null> {
+  const result = await searchJobs(client, {
+    Keyword: jobId,
+    ResultsPerPage: JOB_LOOKUP_PAGE_SIZE,
+  });
+  return result.SearchResultItems.find(
+    (i) => i.MatchedObjectId === jobId,
+  ) ?? null;
 }
 
 export async function handleSearchJobs(
@@ -118,22 +131,15 @@ export async function handleGetJobDetails(
   client: AxiosInstance,
   params: { job_id: string },
 ): Promise<CallToolResult> {
-  let searchResult;
+  let item;
   try {
-    searchResult = await searchJobs(client, {
-      Keyword: params.job_id,
-      ResultsPerPage: JOB_LOOKUP_PAGE_SIZE,
-    });
+    item = await lookupJobById(client, params.job_id);
   } catch {
     return {
       content: [{ type: 'text', text: 'Unable to search USAJobs at this time. Please try again later.' }],
       isError: true,
     };
   }
-
-  const item = searchResult.SearchResultItems.find(
-    (i) => i.MatchedObjectId === params.job_id,
-  );
 
   if (!item) {
     return {
@@ -152,6 +158,70 @@ export async function handleGetJobDetails(
       {
         type: 'text',
         text: JSON.stringify(formatJobFull(item), null, 2),
+      },
+    ],
+  };
+}
+
+export async function handleCompareJobs(
+  client: AxiosInstance,
+  params: { job_ids: string[]; include_details?: boolean },
+): Promise<CallToolResult> {
+  const uniqueIds = [...new Set(params.job_ids)];
+
+  if (uniqueIds.length < 2 || uniqueIds.length > 5) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Please provide 2 to 5 unique job IDs to compare. Got ${uniqueIds.length}.`,
+        },
+      ],
+      isError: true,
+    };
+  }
+
+  const results = await Promise.allSettled(
+    uniqueIds.map((id) => lookupJobById(client, id)),
+  );
+
+  const jobs: ReturnType<typeof formatJob>[] = [];
+  const notFound: string[] = [];
+  const errors: string[] = [];
+
+  for (let i = 0; i < uniqueIds.length; i++) {
+    const result = results[i];
+    const id = uniqueIds[i];
+
+    if (result.status === 'rejected') {
+      errors.push(id);
+    } else if (result.value === null) {
+      notFound.push(id);
+    } else {
+      const formatted = params.include_details
+        ? formatJobFull(result.value)
+        : formatJob(result.value);
+      jobs.push(formatted);
+    }
+  }
+
+  if (jobs.length === 0) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `None of the requested jobs could be found. Not found: ${notFound.join(', ')}. Errors: ${errors.join(', ')}.`,
+        },
+      ],
+      isError: true,
+    };
+  }
+
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify({ jobs, not_found: notFound, errors }, null, 2),
       },
     ],
   };
