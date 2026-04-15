@@ -2,18 +2,18 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.skivuha/federal-compass-mcp",
   "title": "Federal Compass MCP",
-  "description": "Your AI compass from private sector to federal career — search USAJobs, explain federal concepts, analyze resumes",
+  "description": "AI compass from private sector to federal career — USAJobs search, salary, KSA",
   "repository": {
     "url": "https://github.com/skivuha/federal-compass-mcp",
     "source": "github"
   },
-  "version": "0.1.5",
+  "version": "0.1.6",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "federal-compass-mcp",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "transport": {
         "type": "stdio"
       },
