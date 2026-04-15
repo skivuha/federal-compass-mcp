@@ -135,5 +135,5 @@ export function findLocalityArea(query: string): LocalityMatch {
 
   if (bestMatch && bestScore > 0) return { ...bestMatch };
 
-  return REST_OF_US;
+  return { ...REST_OF_US };
 }
