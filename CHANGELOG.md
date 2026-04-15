@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.4...federal-compass-mcp-v0.1.5) (2026-04-15)
+
+
+### Features
+
+* add extract_ksa tool for structured KSA requirement extraction ([#20](https://github.com/skivuha/federal-compass-mcp/issues/20)) ([5f1f428](https://github.com/skivuha/federal-compass-mcp/commit/5f1f4285998aee1e930b7971d8d6efc4acddc8cf))
+
 ## [0.1.4](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.3...federal-compass-mcp-v0.1.4) (2026-04-15)
 
 
