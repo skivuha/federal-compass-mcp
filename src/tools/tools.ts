@@ -106,7 +106,7 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
 
   server.tool(
     'extract_ksa',
-    'Extract KSA (Knowledge, Skills, Abilities) requirements from a federal job posting. Categorizes requirements by type and optionally matches them against your saved CV. Returns structured requirements with match status.',
+    'Extract KSA (Knowledge, Skills, Abilities) requirements from a federal job posting. Categorizes requirements by type (knowledge, skill, ability, experience, education, certification, other) and optionally matches them against your saved CV.',
     {
       job_id: z.string().describe('Job ID (MatchedObjectId from search results)'),
     },

@@ -40,7 +40,7 @@ function splitIntoSentences(text: string): string[] {
   return text
     .split(/[.;]\s+/)
     .map((sentence) => sentence.trim())
-    .filter((sentence) => sentence.length > 10);
+    .filter((sentence) => sentence.length > 3);
 }
 
 function classifySentence(sentence: string): KsaType | null {
