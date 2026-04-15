@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.1...federal-compass-mcp-v0.1.2) (2026-04-15)
+
+
+### Features
+
+* add compare_jobs tool, extract lookupJobById helper ([#5](https://github.com/skivuha/federal-compass-mcp/issues/5)) ([5d8787f](https://github.com/skivuha/federal-compass-mcp/commit/5d8787fbbd570d6f7113717486349d79590168c3))
+
 ## [0.1.1](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.0...federal-compass-mcp-v0.1.1) (2026-04-15)
 
 
