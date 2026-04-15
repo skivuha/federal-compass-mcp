@@ -1,6 +1,6 @@
 {
   "name": "federal-compass-mcp",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Your AI compass from private sector to federal career — MCP server for USAJobs API",
   "mcpName": "io.github.skivuha/federal-compass-mcp",
   "keywords": [

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.5...federal-compass-mcp-v0.1.6) (2026-04-15)
+
+
+### Bug Fixes
+
+* update README tools table with all 10 tools ([#24](https://github.com/skivuha/federal-compass-mcp/issues/24)) ([553fa72](https://github.com/skivuha/federal-compass-mcp/commit/553fa725bc7175cbd4834bfc2a478378f2a3f1fc))
+
 ## [0.1.5](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.4...federal-compass-mcp-v0.1.5) (2026-04-15)
 
 
