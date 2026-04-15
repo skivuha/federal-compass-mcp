@@ -17,7 +17,8 @@ describe('federal-glossary', () => {
     expect(result!.gradeDetail!.min).toBe(90925);
     expect(result!.gradeDetail!.max).toBe(118204);
     expect(result!.gradeDetail!.steps).toHaveLength(10);
-    expect(result!.gradeDetail!.steps[0]).toBe(90925);
+    expect(result!.gradeDetail!.steps[0]).toBe(result!.gradeDetail!.min);
+    expect(result!.gradeDetail!.steps[9]).toBe(result!.gradeDetail!.max);
   });
 
   it('finds security clearance by keyword', () => {
