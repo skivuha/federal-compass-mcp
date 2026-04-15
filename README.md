@@ -3,8 +3,10 @@
 > Your AI compass from private sector to federal career
 
 [![npm version](https://img.shields.io/npm/v/federal-compass-mcp.svg)](https://npmjs.org/package/federal-compass-mcp)
+[![CI](https://github.com/skivuha/federal-compass-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/skivuha/federal-compass-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MCP](https://img.shields.io/badge/MCP-compatible-blue.svg)](https://modelcontextprotocol.io)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/skivuha/federal-compass-mcp/badge)](https://scorecard.dev/viewer/?uri=github.com/skivuha/federal-compass-mcp)
 
 Federal job descriptions are 5 pages of legal language. GS grades, clearance levels, hiring paths — none of this is explained anywhere. `federal-compass-mcp` connects Claude to the official [USAJobs API](https://developer.usajobs.gov) and turns it into an AI advisor that speaks plain English.
 
