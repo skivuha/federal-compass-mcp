@@ -152,7 +152,7 @@ export function lookupConcept(query: string): GlossaryEntry | undefined {
         ...entry,
         details: {
           lowestGrade1Min: GS_STEPS['1'][0],
-          highestGrade15Max: GS_STEPS['15'][9],
+          highestGrade15Max: GS_STEPS['15'][GS_STEPS['15'].length - 1],
           totalGrades: 15,
           stepsPerGrade: 10,
         },
