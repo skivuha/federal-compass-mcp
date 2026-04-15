@@ -3,6 +3,7 @@ import type { AxiosInstance } from 'axios';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { handleSearchJobs, handleGetJobDetails, handleCompareJobs } from './search.js';
 import { handleSaveCV, handleGetCV } from './cv.js';
+import { handleCalculateSalary } from './salary.js';
 import {
   handleExplainConcept,
   handleFindMatchingJobs,
@@ -89,5 +90,16 @@ export function registerTools(server: McpServer, client: AxiosInstance): void {
       include_details: z.boolean().optional().describe('Include duties, qualifications, and job summary (default: false)'),
     },
     async (params) => handleCompareJobs(client, params),
+  );
+
+  server.tool(
+    'calculate_salary',
+    'Calculate federal GS salary with locality pay adjustment. Returns base pay plus locality-adjusted pay for a specific grade, step, and location. Covers all 15 GS grades and ~58 locality pay areas.',
+    {
+      grade: z.string().describe('GS grade: "13" or "GS-13"'),
+      step: z.number().int().min(1).max(10).optional().describe('Step 1-10. Omit to see all 10 steps.'),
+      location: z.string().optional().describe('Location for locality pay: "Raleigh", "DC", "NYC", "San Francisco". Defaults to Rest of US.'),
+    },
+    async (params) => handleCalculateSalary(params),
   );
 }
