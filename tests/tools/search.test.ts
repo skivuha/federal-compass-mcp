@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { JOB_LOOKUP_PAGE_SIZE } from '../../src/tools/search.js';
 
 vi.mock('../../src/api/usajobs-client.js', () => ({
   searchJobs: vi.fn(),
@@ -101,7 +102,7 @@ describe('search tools', () => {
   });
 
   describe('handleGetJobDetails', () => {
-    it('returns full job details', async () => {
+    it('searches by Keyword with job_id and returns full details', async () => {
       const { searchJobs } = await import('../../src/api/usajobs-client.js');
       const { handleGetJobDetails } = await import('../../src/tools/search.js');
 
@@ -120,11 +121,33 @@ describe('search tools', () => {
 
       const client = {} as any;
       const result = await handleGetJobDetails(client, { job_id: '12345' });
-      const parsed = JSON.parse(result.content[0].text);
 
+      expect(searchJobs).toHaveBeenCalledWith(
+        client,
+        expect.objectContaining({ Keyword: '12345', ResultsPerPage: JOB_LOOKUP_PAGE_SIZE }),
+      );
+
+      const parsed = JSON.parse(result.content[0].text);
       expect(parsed.title).toBe('Developer');
       expect(parsed.major_duties).toHaveLength(2);
       expect(parsed.qualification_summary).toBe('Qualifications here');
+    });
+
+    it('returns error when job not found in results', async () => {
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { handleGetJobDetails } = await import('../../src/tools/search.js');
+
+      vi.mocked(searchJobs).mockResolvedValueOnce({
+        SearchResultCount: 1,
+        SearchResultCountAll: 1,
+        SearchResultItems: [mockJobItem({ id: '99999' })],
+      });
+
+      const client = {} as any;
+      const result = await handleGetJobDetails(client, { job_id: '12345' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Job not found');
     });
   });
 });

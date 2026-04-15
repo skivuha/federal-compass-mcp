@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fs from 'node:fs/promises';
+import { JOB_LOOKUP_PAGE_SIZE } from '../../src/tools/search.js';
 
 vi.mock('node:fs/promises');
 vi.mock('../../src/api/usajobs-client.js', () => ({
@@ -135,8 +136,13 @@ describe('advisor tools', () => {
 
       const client = {} as any;
       const result = await handleCheckQualification(client, { job_id: '12345' });
-      const parsed = JSON.parse(result.content[0].text);
 
+      expect(searchJobs).toHaveBeenCalledWith(
+        client,
+        expect.objectContaining({ Keyword: '12345', ResultsPerPage: JOB_LOOKUP_PAGE_SIZE }),
+      );
+
+      const parsed = JSON.parse(result.content[0].text);
       expect(parsed.cv).toContain('Senior Developer');
       expect(parsed.job.title).toBe('Software Developer');
       expect(parsed.job.key_requirements).toBeDefined();

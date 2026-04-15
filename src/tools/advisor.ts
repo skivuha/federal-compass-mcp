@@ -3,6 +3,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { searchJobs, type SearchResultItem } from '../api/usajobs-client.js';
 import { getCodelist } from '../cache/codelist-cache.js';
 import { lookupConcept } from '../data/federal-glossary.js';
+import { JOB_LOOKUP_PAGE_SIZE } from './search.js';
 import { requireCV } from './cv.js';
 
 export async function handleExplainConcept(params: {
@@ -222,8 +223,8 @@ export async function handleCheckQualification(
   let searchResult;
   try {
     searchResult = await searchJobs(client, {
-      ControlNumber: params.job_id,
-      ResultsPerPage: 1,
+      Keyword: params.job_id,
+      ResultsPerPage: JOB_LOOKUP_PAGE_SIZE,
     });
   } catch {
     return {
