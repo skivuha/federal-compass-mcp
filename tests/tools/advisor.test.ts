@@ -135,8 +135,13 @@ describe('advisor tools', () => {
 
       const client = {} as any;
       const result = await handleCheckQualification(client, { job_id: '12345' });
-      const parsed = JSON.parse(result.content[0].text);
 
+      expect(searchJobs).toHaveBeenCalledWith(
+        client,
+        expect.objectContaining({ Keyword: '12345', ResultsPerPage: 10 }),
+      );
+
+      const parsed = JSON.parse(result.content[0].text);
       expect(parsed.cv).toContain('Senior Developer');
       expect(parsed.job.title).toBe('Software Developer');
       expect(parsed.job.key_requirements).toBeDefined();
