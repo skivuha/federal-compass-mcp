@@ -27,6 +27,19 @@ describe('cv tools', () => {
       );
       expect(result.content[0].text).toContain('saved');
     });
+
+    it('returns error when file system fails', async () => {
+      const { handleSaveCV } = await import('../../src/tools/cv.js');
+
+      vi.mocked(fs.mkdir).mockRejectedValueOnce(new Error('EACCES'));
+
+      const result = await handleSaveCV({
+        content: 'Some CV text',
+      });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Unable to save');
+    });
   });
 
   describe('handleGetCV', () => {

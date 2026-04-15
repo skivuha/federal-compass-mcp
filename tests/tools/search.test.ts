@@ -78,6 +78,21 @@ describe('search tools', () => {
       expect(parsed.agencies_in_results).toContain('SSA');
     });
 
+    it('returns error when API fails', async () => {
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { resolveCode } = await import('../../src/cache/codelist-cache.js');
+      const { handleSearchJobs } = await import('../../src/tools/search.js');
+
+      vi.mocked(resolveCode).mockResolvedValue(undefined);
+      vi.mocked(searchJobs).mockRejectedValueOnce(new Error('Network error'));
+
+      const client = {} as any;
+      const result = await handleSearchJobs(client, { keyword: 'test' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Unable to search');
+    });
+
     it('resolves agency name to code via codelist', async () => {
       const { searchJobs } = await import('../../src/api/usajobs-client.js');
       const { resolveCode } = await import('../../src/cache/codelist-cache.js');

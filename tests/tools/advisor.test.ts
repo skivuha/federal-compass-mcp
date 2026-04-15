@@ -76,6 +76,18 @@ describe('advisor tools', () => {
 
       expect(text).toContain('Information Technology Management');
     });
+
+    it('returns not found message when concept is unknown everywhere', async () => {
+      const { handleExplainConcept } = await import('../../src/tools/advisor.js');
+      const { getCodelist } = await import('../../src/cache/codelist-cache.js');
+
+      vi.mocked(getCodelist).mockResolvedValue([]);
+
+      const result = await handleExplainConcept({ concept: 'xyzzy_unknown_thing' });
+      const text = result.content[0].text;
+
+      expect(text).toContain('Concept not found');
+    });
   });
 
   describe('handleFindMatchingJobs', () => {
