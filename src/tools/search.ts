@@ -185,25 +185,21 @@ export async function handleCompareJobs(
     uniqueIds.map((id) => lookupJobById(client, id)),
   );
 
-  const jobs: ReturnType<typeof formatJob>[] = [];
-  const notFound: string[] = [];
-  const errors: string[] = [];
+  const classified = results.map((result, i) => ({ result, id: uniqueIds[i] }));
 
-  for (let i = 0; i < uniqueIds.length; i++) {
-    const result = results[i];
-    const id = uniqueIds[i];
+  const errors = classified
+    .filter(({ result }) => result.status === 'rejected')
+    .map(({ id }) => id);
 
-    if (result.status === 'rejected') {
-      errors.push(id);
-    } else if (result.value === null) {
-      notFound.push(id);
-    } else {
-      const formatted = params.include_details
-        ? formatJobFull(result.value)
-        : formatJob(result.value);
-      jobs.push(formatted);
-    }
-  }
+  const notFound = classified
+    .filter(({ result }) => result.status === 'fulfilled' && result.value === null)
+    .map(({ id }) => id);
+
+  const format = params.include_details ? formatJobFull : formatJob;
+  const jobs = classified
+    .filter((c): c is { result: PromiseFulfilledResult<SearchResultItem>; id: string } =>
+      c.result.status === 'fulfilled' && c.result.value !== null)
+    .map(({ result }) => format(result.value));
 
   if (jobs.length === 0) {
     const details: string[] = [];
