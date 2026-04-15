@@ -110,6 +110,14 @@ describe('parseKsaRequirements', () => {
     expect(results.length).toBe(3);
   });
 
+  it('handles semicolons without spaces', () => {
+    const results = parseKsaRequirements(
+      'Knowledge of Java;Skill in database design;Ability to work independently.',
+      'qualification_summary',
+    );
+    expect(results.length).toBe(3);
+  });
+
   it('returns empty array for text with no KSA patterns', () => {
     const results = parseKsaRequirements(
       'This is a general description with no specific requirements.',
@@ -206,6 +214,66 @@ describe('handleExtractKsa', () => {
 
     expect(parsed.requirements).toHaveLength(0);
     expect(parsed.raw_qualification_summary).toBe('');
+  });
+
+  it('matches requirement when 50%+ keywords overlap with CV', async () => {
+    const { searchJobs } = await import('../../src/api/usajobs-client.js');
+    const { handleExtractKsa } = await import('../../src/tools/ksa.js');
+
+    vi.mocked(searchJobs).mockResolvedValueOnce({
+      SearchResultCount: 1,
+      SearchResultCountAll: 1,
+      SearchResultItems: [mockJobItem({
+        qualifications: 'Knowledge of React and Angular.',
+        duties: [],
+      })],
+    });
+
+    // requirement words: "knowledge", "react", "angular" — CV has "knowledge", "react" = 2/3 = 67%
+    const stored = {
+      content: 'Strong knowledge of React development.',
+      savedAt: '2026-04-15T00:00:00.000Z',
+      format: 'txt',
+    };
+    vi.mocked(fs.readFile).mockResolvedValueOnce(JSON.stringify(stored));
+
+    const client = {} as any;
+    const result = await handleExtractKsa(client, { job_id: '12345' });
+    const parsed = JSON.parse(result.content[0].text);
+
+    const knowledgeReq = parsed.requirements.find((r: any) => r.type === 'knowledge');
+    expect(knowledgeReq).toBeDefined();
+    expect(knowledgeReq.matched).toBe(true);
+  });
+
+  it('does not match requirement when below 50% keyword overlap', async () => {
+    const { searchJobs } = await import('../../src/api/usajobs-client.js');
+    const { handleExtractKsa } = await import('../../src/tools/ksa.js');
+
+    vi.mocked(searchJobs).mockResolvedValueOnce({
+      SearchResultCount: 1,
+      SearchResultCountAll: 1,
+      SearchResultItems: [mockJobItem({
+        qualifications: 'Knowledge of React, Angular, Vue, TypeScript, and GraphQL frameworks.',
+        duties: [],
+      })],
+    });
+
+    // CV has only React — 1 of 5+ keywords < 50%
+    const stored = {
+      content: 'Basic React experience.',
+      savedAt: '2026-04-15T00:00:00.000Z',
+      format: 'txt',
+    };
+    vi.mocked(fs.readFile).mockResolvedValueOnce(JSON.stringify(stored));
+
+    const client = {} as any;
+    const result = await handleExtractKsa(client, { job_id: '12345' });
+    const parsed = JSON.parse(result.content[0].text);
+
+    const knowledgeReq = parsed.requirements.find((r: any) => r.type === 'knowledge');
+    expect(knowledgeReq).toBeDefined();
+    expect(knowledgeReq.matched).toBe(false); // below 50%
   });
 
   it('returns error when job not found', async () => {

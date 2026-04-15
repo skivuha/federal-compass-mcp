@@ -90,11 +90,10 @@ function extractMeaningfulWords(text: string): string[] {
   )];
 }
 
-function matchRequirementToCV(requirement: KsaRequirement, cvContent: string): boolean {
+function matchRequirementToCV(requirement: KsaRequirement, cvWordSet: Set<string>): boolean {
   const words = extractMeaningfulWords(requirement.text);
   if (words.length === 0) return false;
-  const cvWords = new Set(extractMeaningfulWords(cvContent));
-  const matchedCount = words.filter((word) => cvWords.has(word)).length;
+  const matchedCount = words.filter((word) => cvWordSet.has(word)).length;
   return matchedCount / words.length >= 0.5;
 }
 
@@ -142,9 +141,11 @@ export async function handleExtractKsa(
     // CV not available — matching will be skipped
   }
 
+  const cvWordSet = cvContent !== null ? new Set(extractMeaningfulWords(cvContent)) : null;
+
   const requirements = allRequirements.map((requirement) => ({
     ...requirement,
-    matched: cvContent !== null ? matchRequirementToCV(requirement, cvContent) : null,
+    matched: cvWordSet !== null ? matchRequirementToCV(requirement, cvWordSet) : null,
   }));
 
   const matchedCount = requirements.filter((r) => r.matched === true).length;
