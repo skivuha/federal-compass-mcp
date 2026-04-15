@@ -77,11 +77,14 @@ Look at this job posting — am I qualified?
 |------|-------------|
 | `search_jobs` | Search federal job openings. All filters optional — keyword, location, salary, grade, agency, remote |
 | `get_job_details` | Get full details for a specific job posting |
+| `compare_jobs` | Compare 2-5 job postings side by side |
 | `save_cv` | Save your CV locally for automatic use in analysis |
 | `get_cv` | Read your saved CV |
 | `explain_federal_concept` | Explain GS grades, clearances, hiring paths, pay plans |
+| `calculate_salary` | Calculate GS salary with locality pay for any grade, step, and location |
 | `find_matching_jobs` | Find jobs matching your CV — extracts skills and searches USAJobs |
 | `check_qualification` | Compare your CV against a specific job posting |
+| `extract_ksa` | Extract KSA requirements from a job posting, optionally match against your CV |
 
 ---
 
