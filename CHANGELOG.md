@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.7](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.6...federal-compass-mcp-v0.1.7) (2026-04-15)
+
+
+### Bug Fixes
+
+* shorten server.json description to fit MCP Registry 100 char limit ([#26](https://github.com/skivuha/federal-compass-mcp/issues/26)) ([5a8b083](https://github.com/skivuha/federal-compass-mcp/commit/5a8b0839ccbac30b728942349b7b609af86bfba9))
+
 ## [0.1.6](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.5...federal-compass-mcp-v0.1.6) (2026-04-15)
 
 
