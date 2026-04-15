@@ -18,6 +18,10 @@ export async function handleExplainConcept(params: {
       parts.push(
         `\n**Grade ${entry.gradeDetail.grade} Pay Range:** $${entry.gradeDetail.min.toLocaleString()} — $${entry.gradeDetail.max.toLocaleString()} (base pay, before locality adjustment)`,
       );
+      const stepsFormatted = entry.gradeDetail.steps
+        .map((s, i) => `Step ${i + 1}: $${s.toLocaleString()}`)
+        .join(', ');
+      parts.push(`\n**All Steps:** ${stepsFormatted}`);
     }
 
     if (entry.timeline) {
