@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fs from 'node:fs/promises';
-import { JOB_LOOKUP_PAGE_SIZE } from '../../src/tools/search.js';
 
 vi.mock('node:fs/promises');
 vi.mock('../../src/api/usajobs-client.js', () => ({
@@ -10,6 +9,13 @@ vi.mock('../../src/cache/codelist-cache.js', () => ({
   getCodelist: vi.fn(),
   resolveCode: vi.fn(),
 }));
+vi.mock('../../src/tools/search.js', async () => {
+  const actual = await vi.importActual('../../src/tools/search.js');
+  return {
+    ...actual,
+    lookupJobById: vi.fn(),
+  };
+});
 
 // Helper to create mock job item
 function mockJobItem(overrides: Record<string, any> = {}) {
@@ -132,7 +138,7 @@ describe('advisor tools', () => {
   describe('handleCheckQualification', () => {
     it('returns CV and job data side by side', async () => {
       const { handleCheckQualification } = await import('../../src/tools/advisor.js');
-      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { lookupJobById } = await import('../../src/tools/search.js');
 
       const stored = {
         content: 'Senior Developer with 8 years React experience',
@@ -140,19 +146,12 @@ describe('advisor tools', () => {
         format: 'txt',
       };
       vi.mocked(fs.readFile).mockResolvedValueOnce(JSON.stringify(stored));
-      vi.mocked(searchJobs).mockResolvedValueOnce({
-        SearchResultCount: 1,
-        SearchResultCountAll: 1,
-        SearchResultItems: [mockJobItem()],
-      });
+      vi.mocked(lookupJobById).mockResolvedValueOnce(mockJobItem());
 
       const client = {} as any;
       const result = await handleCheckQualification(client, { job_id: '12345' });
 
-      expect(searchJobs).toHaveBeenCalledWith(
-        client,
-        expect.objectContaining({ Keyword: '12345', ResultsPerPage: JOB_LOOKUP_PAGE_SIZE }),
-      );
+      expect(lookupJobById).toHaveBeenCalledWith(client, '12345');
 
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.cv).toContain('Senior Developer');

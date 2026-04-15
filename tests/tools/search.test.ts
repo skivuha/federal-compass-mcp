@@ -165,4 +165,144 @@ describe('search tools', () => {
       expect(result.content[0].text).toContain('Job not found');
     });
   });
+
+  describe('lookupJobById', () => {
+    it('returns item when found in search results', async () => {
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { lookupJobById } = await import('../../src/tools/search.js');
+
+      vi.mocked(searchJobs).mockResolvedValueOnce({
+        SearchResultCount: 1,
+        SearchResultCountAll: 1,
+        SearchResultItems: [mockJobItem({ id: '12345' })],
+      });
+
+      const client = {} as any;
+      const item = await lookupJobById(client, '12345');
+
+      expect(item).not.toBeNull();
+      expect(item!.MatchedObjectId).toBe('12345');
+      expect(searchJobs).toHaveBeenCalledWith(
+        client,
+        expect.objectContaining({ Keyword: '12345' }),
+      );
+    });
+
+    it('returns null when job not in results', async () => {
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { lookupJobById } = await import('../../src/tools/search.js');
+
+      vi.mocked(searchJobs).mockResolvedValueOnce({
+        SearchResultCount: 1,
+        SearchResultCountAll: 1,
+        SearchResultItems: [mockJobItem({ id: '99999' })],
+      });
+
+      const client = {} as any;
+      const item = await lookupJobById(client, '12345');
+
+      expect(item).toBeNull();
+    });
+  });
+
+  describe('handleCompareJobs', () => {
+    it('compares multiple jobs and returns formatted results', async () => {
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { handleCompareJobs } = await import('../../src/tools/search.js');
+
+      vi.mocked(searchJobs)
+        .mockResolvedValueOnce({
+          SearchResultCount: 1,
+          SearchResultCountAll: 1,
+          SearchResultItems: [mockJobItem({ id: '111', title: 'Developer' })],
+        })
+        .mockResolvedValueOnce({
+          SearchResultCount: 1,
+          SearchResultCountAll: 1,
+          SearchResultItems: [mockJobItem({ id: '222', title: 'Engineer' })],
+        });
+
+      const client = {} as any;
+      const result = await handleCompareJobs(client, { job_ids: ['111', '222'] });
+      const parsed = JSON.parse(result.content[0].text);
+
+      expect(parsed.jobs).toHaveLength(2);
+      expect(parsed.jobs[0].title).toBe('Developer');
+      expect(parsed.jobs[1].title).toBe('Engineer');
+      expect(parsed.not_found).toHaveLength(0);
+      expect(parsed.errors).toHaveLength(0);
+    });
+
+    it('separates not_found and errors', async () => {
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { handleCompareJobs } = await import('../../src/tools/search.js');
+
+      vi.mocked(searchJobs)
+        .mockResolvedValueOnce({
+          SearchResultCount: 1,
+          SearchResultCountAll: 1,
+          SearchResultItems: [mockJobItem({ id: '111' })],
+        })
+        .mockResolvedValueOnce({
+          SearchResultCount: 0,
+          SearchResultCountAll: 0,
+          SearchResultItems: [],
+        })
+        .mockRejectedValueOnce(new Error('API error'));
+
+      const client = {} as any;
+      const result = await handleCompareJobs(client, { job_ids: ['111', '222', '333'] });
+      const parsed = JSON.parse(result.content[0].text);
+
+      expect(parsed.jobs).toHaveLength(1);
+      expect(parsed.not_found).toContain('222');
+      expect(parsed.errors).toContain('333');
+    });
+
+    it('returns error when less than 2 IDs', async () => {
+      const { handleCompareJobs } = await import('../../src/tools/search.js');
+
+      const client = {} as any;
+      const result = await handleCompareJobs(client, { job_ids: ['111'] });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('2 to 5');
+    });
+
+    it('returns error when more than 5 IDs', async () => {
+      const { handleCompareJobs } = await import('../../src/tools/search.js');
+
+      const client = {} as any;
+      const result = await handleCompareJobs(client, {
+        job_ids: ['1', '2', '3', '4', '5', '6'],
+      });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('2 to 5');
+    });
+
+    it('deduplicates job IDs', async () => {
+      const { handleCompareJobs } = await import('../../src/tools/search.js');
+
+      const client = {} as any;
+      const result = await handleCompareJobs(client, { job_ids: ['111', '111', '111'] });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('2 to 5');
+    });
+
+    it('returns isError when all jobs fail', async () => {
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { handleCompareJobs } = await import('../../src/tools/search.js');
+
+      vi.mocked(searchJobs)
+        .mockRejectedValueOnce(new Error('fail'))
+        .mockRejectedValueOnce(new Error('fail'));
+
+      const client = {} as any;
+      const result = await handleCompareJobs(client, { job_ids: ['111', '222'] });
+
+      expect(result.isError).toBe(true);
+    });
+  });
 });

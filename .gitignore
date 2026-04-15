@@ -2,6 +2,9 @@
 build/
 dist/
 
+# Internal docs
+docs/
+
 # Logs
 logs
 *.log
