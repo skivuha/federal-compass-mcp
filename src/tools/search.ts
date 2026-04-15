@@ -206,11 +206,15 @@ export async function handleCompareJobs(
   }
 
   if (jobs.length === 0) {
+    const details: string[] = [];
+    if (notFound.length > 0) details.push(`Not found: ${notFound.join(', ')}`);
+    if (errors.length > 0) details.push(`Errors: ${errors.join(', ')}`);
+
     return {
       content: [
         {
           type: 'text',
-          text: `None of the requested jobs could be found. Not found: ${notFound.join(', ')}. Errors: ${errors.join(', ')}.`,
+          text: `None of the requested jobs could be found.${details.length > 0 ? ` ${details.join('. ')}.` : ''}`,
         },
       ],
       isError: true,
