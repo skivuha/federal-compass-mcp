@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.7...federal-compass-mcp-v0.1.8) (2026-04-17)
+
+
+### Bug Fixes
+
+* add CONTRIBUTING.md ([#28](https://github.com/skivuha/federal-compass-mcp/issues/28)) ([6d8be59](https://github.com/skivuha/federal-compass-mcp/commit/6d8be5930c1e8bfa7ac1727e94a39abb04f717e6))
+
 ## [0.1.7](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.6...federal-compass-mcp-v0.1.7) (2026-04-15)
 
 
