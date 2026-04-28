@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/skivuha-federal-compass-mcp-badge.png)](https://mseep.ai/app/skivuha-federal-compass-mcp)
+
 # federal-compass-mcp
 
 > Your AI compass from private sector to federal career
