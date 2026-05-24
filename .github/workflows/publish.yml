@@ -6,7 +6,8 @@ on:
 jobs:
   publish:
     uses: ./.github/workflows/_publish.yml
-    secrets: inherit
     permissions:
       contents: read
       id-token: write
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
