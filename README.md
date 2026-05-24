@@ -116,7 +116,7 @@ Coming from private sector, federal job postings feel like a different language:
 
 ## Requirements
 
-- Node.js v20+
+- Node.js v22+
 - Free [USAJobs API key](https://developer.usajobs.gov/apirequest/index)
 - Any MCP-compatible client (Claude Desktop, VS Code, Cursor, etc.)
 
