@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.8...federal-compass-mcp-v0.1.9) (2026-05-24)
+
+
+### Bug Fixes
+
+* update hono to 4.12.14 to fix HTML injection vulnerability ([#30](https://github.com/skivuha/federal-compass-mcp/issues/30)) ([a6dfb56](https://github.com/skivuha/federal-compass-mcp/commit/a6dfb561a94e7fc048272d279235ebb754522cef))
+
 ## [0.1.8](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.7...federal-compass-mcp-v0.1.8) (2026-04-17)
 
 
