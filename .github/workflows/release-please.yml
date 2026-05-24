@@ -26,8 +26,7 @@ jobs:
     needs: release-please
     if: needs.release-please.outputs.release_created == 'true'
     uses: ./.github/workflows/_publish.yml
+    secrets: inherit
     permissions:
       contents: read
       id-token: write
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
