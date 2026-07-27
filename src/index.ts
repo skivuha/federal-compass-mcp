@@ -3,6 +3,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { createApiClient } from './api/usajobs-client.js';
 import { registerTools } from './tools/tools.js';
 import { createLogger } from './logger.js';
+import { SERVER_VERSION } from './version.js';
 
 const log = createLogger('server');
 
@@ -38,7 +39,7 @@ async function main(): Promise<void> {
 
   const server = new McpServer({
     name: 'federal-compass',
-    version: '0.1.0',
+    version: SERVER_VERSION,
   });
 
   registerTools(server, client);
