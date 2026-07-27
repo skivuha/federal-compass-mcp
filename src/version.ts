@@ -17,4 +17,4 @@
  *
  * tests/version.test.ts guards the value and both of those conditions.
  */
-export const SERVER_VERSION = '0.1.9'; // x-release-please-version
+export const SERVER_VERSION = '0.1.10'; // x-release-please-version
