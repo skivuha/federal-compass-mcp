@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.10](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.9...federal-compass-mcp-v0.1.10) (2026-07-27)
+
+
+### Bug Fixes
+
+* report the real package version to MCP clients ([#78](https://github.com/skivuha/federal-compass-mcp/issues/78)) ([991762d](https://github.com/skivuha/federal-compass-mcp/commit/991762db89dc35a5c96aa1a67b54dcf4cdf414b8))
+
 ## [0.1.9](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.8...federal-compass-mcp-v0.1.9) (2026-05-24)
 
 
