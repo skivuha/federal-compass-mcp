@@ -150,6 +150,7 @@ export async function handleFindMatchingJobs(
     keywords.slice(6, 10).join(' '),
   ].filter((g) => g.length > 0);
 
+  let failedSearches = 0;
   for (const group of keywordGroups) {
     try {
       const result = await searchJobs(client, {
@@ -158,8 +159,15 @@ export async function handleFindMatchingJobs(
       });
       searches.push({ keywords: group, items: result.SearchResultItems });
     } catch {
-      // Skip failed searches
+      failedSearches += 1;
     }
+  }
+
+  if (searches.length === 0) {
+    return {
+      content: [{ type: 'text', text: 'Unable to search USAJobs at this time. Please try again later.' }],
+      isError: true,
+    };
   }
 
   // Deduplicate by job ID
@@ -185,6 +193,9 @@ export async function handleFindMatchingJobs(
             keywords_used: keywordGroups,
             total_results: formatted.length,
             results: formatted,
+            ...(failedSearches > 0 ? {
+              warnings: [`${failedSearches} search request(s) failed; results may be incomplete.`],
+            } : {}),
           },
           null,
           2,

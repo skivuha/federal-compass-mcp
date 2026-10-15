@@ -12,9 +12,6 @@ export default defineConfig({
     ssr: true,
     rollupOptions: {
       external: [/^node:/, /^@modelcontextprotocol/, /^axios/, /^debug/, /^zod/],
-      output: {
-        banner: '#!/usr/bin/env node',
-      },
     },
   },
   test: {
