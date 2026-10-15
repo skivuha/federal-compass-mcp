@@ -53,6 +53,50 @@ describe('search tools', () => {
   });
 
   describe('handleSearchJobs', () => {
+    const filters = [
+      ['agency', 'agencysubelements', 'Organization'],
+      ['who_may_apply', 'whomayapply', 'WhoMayApply'],
+      ['security_clearance', 'securityclearances', 'SecurityClearance'],
+    ] as const;
+
+    it.each(filters)('rejects unresolved %s without broadening the search', async (field) => {
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { resolveCode } = await import('../../src/cache/codelist-cache.js');
+      const { handleSearchJobs } = await import('../../src/tools/search.js');
+      vi.mocked(resolveCode).mockResolvedValueOnce(undefined);
+      vi.mocked(searchJobs).mockResolvedValue({ SearchResultCount: 0, SearchResultCountAll: 0, SearchResultItems: [] });
+      const result = await handleSearchJobs({} as any, { [field]: 'unknown' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('filter');
+      expect(searchJobs).not.toHaveBeenCalled();
+    });
+
+    it.each(filters)('returns an MCP error when %s resolution fails', async (field) => {
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { resolveCode } = await import('../../src/cache/codelist-cache.js');
+      const { handleSearchJobs } = await import('../../src/tools/search.js');
+      vi.mocked(resolveCode).mockRejectedValueOnce(new Error('private transport details'));
+      const result = await handleSearchJobs({} as any, { [field]: 'known' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Unable to search');
+      expect(result.content[0].text).not.toContain('private transport details');
+      expect(searchJobs).not.toHaveBeenCalled();
+    });
+
+    it.each(filters)('applies the resolved %s filter', async (field, list, apiField) => {
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      const { resolveCode } = await import('../../src/cache/codelist-cache.js');
+      const { handleSearchJobs } = await import('../../src/tools/search.js');
+      vi.mocked(resolveCode).mockResolvedValueOnce('resolved-code');
+      vi.mocked(searchJobs).mockResolvedValueOnce({ SearchResultCount: 0, SearchResultCountAll: 0, SearchResultItems: [] });
+      const client = {} as any;
+      const result = await handleSearchJobs(client, { [field]: 'known' });
+      expect(result.isError).not.toBe(true);
+      expect(resolveCode).toHaveBeenCalledWith(list, 'known');
+      expect(searchJobs).toHaveBeenCalledWith(client, { [apiField]: 'resolved-code' });
+      expect(JSON.parse(result.content[0].text)).toEqual({ total_count: 0, showing: 0, results: [], agencies_in_results: [] });
+    });
+
     it('maps params and returns formatted results with agencies', async () => {
       const { searchJobs } = await import('../../src/api/usajobs-client.js');
       const { resolveCode } = await import('../../src/cache/codelist-cache.js');

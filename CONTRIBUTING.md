@@ -13,9 +13,9 @@ npm install
 ## Development
 
 ```bash
-npm test          # run tests
+npm run build      # compile TypeScript (required before CLI tests; rebuild after source changes)
+npm test           # run unit tests and built CLI smoke tests
 npm run typecheck  # check types
-npm run build      # compile TypeScript
 ```
 
 ## USAJobs API Key
@@ -26,7 +26,7 @@ Get a free key at [developer.usajobs.gov](https://developer.usajobs.gov/apireque
 
 1. Create a branch from `main`
 2. Write tests for new features
-3. Make sure `npm test` and `npm run typecheck` pass
+3. Make sure `npm run build`, `npm test`, and `npm run typecheck` pass
 4. Use [conventional commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`)
 5. Open a PR against `main`
 

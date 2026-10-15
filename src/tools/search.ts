@@ -81,22 +81,28 @@ export async function handleSearchJobs(
   if (params.hiring_path) apiParams.HiringPath = params.hiring_path;
   if (params.results_per_page !== undefined) apiParams.ResultsPerPage = params.results_per_page;
 
-  // Resolve human-readable names to API codes
-  if (params.agency) {
-    const code = await resolveCode('agencysubelements', params.agency);
-    if (code) apiParams.Organization = code;
-  }
-  if (params.who_may_apply) {
-    const code = await resolveCode('whomayapply', params.who_may_apply);
-    if (code) apiParams.WhoMayApply = code;
-  }
-  if (params.security_clearance) {
-    const code = await resolveCode('securityclearances', params.security_clearance);
-    if (code) apiParams.SecurityClearance = code;
-  }
-
   let searchResult;
   try {
+    // Resolve every supplied filter before searching; never silently drop one.
+    const filters = [
+      ['agency', 'agencysubelements', 'Organization'],
+      ['who_may_apply', 'whomayapply', 'WhoMayApply'],
+      ['security_clearance', 'securityclearances', 'SecurityClearance'],
+    ] as const;
+
+    for (const [field, codelist, apiField] of filters) {
+      const value = params[field];
+      if (!value) continue;
+      const code = await resolveCode(codelist, value);
+      if (!code) {
+        return {
+          content: [{ type: 'text', text: `Unable to resolve ${field} filter. Please use a more specific value.` }],
+          isError: true,
+        };
+      }
+      apiParams[apiField] = code;
+    }
+
     searchResult = await searchJobs(client, apiParams);
   } catch {
     return {

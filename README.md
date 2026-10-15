@@ -18,7 +18,7 @@ Built for tech professionals transitioning from private sector to federal/govern
 
 - **Searches** federal job openings with optional filters — keyword, location, salary, clearance level
 - **Translates** federal job descriptions into plain language — what they actually want, without the jargon
-- **Analyzes** your CV against specific job postings and tells you if you qualify
+- **Supports CV analysis** by providing your CV and job requirements to your AI assistant for comparison
 - **Explains** federal concepts — GS grades, pay plans, security clearances, hiring paths
 - **Saves** your CV locally so Claude can reference it automatically
 
@@ -88,16 +88,29 @@ Look at this job posting — am I qualified?
 
 ---
 
-## CV storage
+## CV storage and privacy
 
-Your CV is stored locally on your machine — never sent to any server:
+Your saved CV is stored locally on your machine:
 
 ```
 ~/.federal-compass/
   cv.json
-  config.json
   codelists/     <- cached USAJobs reference data
 ```
+
+The `get_cv` and `check_qualification` tools return your CV text to your MCP client. Depending on your client and its configuration, that text may be sent to an AI provider for processing. Review your client's and provider's privacy settings before sharing personal information.
+
+The `find_matching_jobs` tool sends keywords extracted from your CV to USAJOBS to search for relevant vacancies.
+
+---
+
+## Data source and independent analysis
+
+Federal job announcements and API reference data come from [USAJOBS](https://www.usajobs.gov/). Use of the API is subject to the [USAJOBS API Terms of Service](https://developer.usajobs.gov/guides/terms-of-service). Each user should register for and use their own API credentials.
+
+This is an independent project. It is not operated, sponsored, approved, or endorsed by the U.S. Office of Personnel Management (OPM) or USAJOBS.
+
+AI explanations, CV comparisons, and extracted requirement matches are unofficial analysis, not an agency determination of eligibility. Verify requirements, deadlines, and application instructions against the current official announcement on USAJOBS before applying.
 
 ---
 

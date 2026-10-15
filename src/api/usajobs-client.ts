@@ -4,6 +4,7 @@ import { createLogger } from '../logger.js';
 const log = createLogger('api');
 
 const BASE_URL = 'https://data.usajobs.gov/api';
+const REQUEST_TIMEOUT_MS = 15_000;
 
 export interface SearchParams {
   Keyword?: string;
@@ -76,6 +77,7 @@ export interface CodelistResult {
 export function createApiClient(apiKey: string, email: string): AxiosInstance {
   const client = axios.create({
     baseURL: BASE_URL,
+    timeout: REQUEST_TIMEOUT_MS,
     headers: {
       Host: 'data.usajobs.gov',
       'User-Agent': email,
@@ -103,6 +105,8 @@ export async function searchJobs(client: AxiosInstance, params: SearchParams): P
 }
 
 export async function fetchCodelist(name: string): Promise<CodelistResult> {
-  const response = await axios.get(`${BASE_URL}/codelist/${name}`);
+  const response = await axios.get(`${BASE_URL}/codelist/${name}`, {
+    timeout: REQUEST_TIMEOUT_MS,
+  });
   return response.data;
 }

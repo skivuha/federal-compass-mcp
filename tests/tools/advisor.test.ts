@@ -100,6 +100,69 @@ describe('advisor tools', () => {
   });
 
   describe('handleFindMatchingJobs', () => {
+    beforeEach(() => {
+      vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify({
+        content: 'python rust docker kubernetes terraform postgresql',
+        savedAt: '2026-10-15T00:00:00.000Z',
+        format: 'txt',
+      }));
+    });
+
+    it('reports total API failure instead of no matching jobs', async () => {
+      const { handleFindMatchingJobs } = await import('../../src/tools/advisor.js');
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      vi.mocked(searchJobs).mockRejectedValue(new Error('private transport details'));
+      const result = await handleFindMatchingJobs({} as any, {});
+      expect(vi.mocked(searchJobs).mock.calls.length).toBeGreaterThan(1);
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Unable to search');
+      expect(result.content[0].text).not.toContain('private transport details');
+    });
+
+    it('keeps an empty successful search distinct from failure', async () => {
+      const { handleFindMatchingJobs } = await import('../../src/tools/advisor.js');
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      vi.mocked(searchJobs).mockResolvedValue({ SearchResultCount: 0, SearchResultCountAll: 0, SearchResultItems: [] });
+      const result = await handleFindMatchingJobs({} as any, {});
+      expect(result.isError).not.toBe(true);
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.total_results).toBe(0);
+      expect(parsed.results).toEqual([]);
+      expect(Object.keys(parsed).sort()).toEqual(['keywords_used', 'results', 'total_results']);
+    });
+
+    it.each([true, false])('warns about partial failure while preserving successful results (has jobs: %s)', async (hasJobs) => {
+      const { handleFindMatchingJobs } = await import('../../src/tools/advisor.js');
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      vi.mocked(searchJobs)
+        .mockResolvedValue({ SearchResultCount: 0, SearchResultCountAll: 0, SearchResultItems: [] })
+        .mockRejectedValueOnce(new Error('private transport details'))
+        .mockResolvedValueOnce({ SearchResultCount: hasJobs ? 1 : 0, SearchResultCountAll: hasJobs ? 1 : 0, SearchResultItems: hasJobs ? [mockJobItem()] : [] });
+      const result = await handleFindMatchingJobs({} as any, {});
+      expect(result.isError).not.toBe(true);
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.total_results).toBe(hasJobs ? 1 : 0);
+      expect(parsed.results).toHaveLength(hasJobs ? 1 : 0);
+      if (hasJobs) expect(parsed.results[0].job_id).toBe('12345');
+      expect(parsed.warnings).toHaveLength(1);
+      expect(parsed.warnings[0]).toContain('1 search request(s) failed');
+      expect(result.content[0].text).not.toContain('private transport details');
+    });
+
+    it('deduplicates jobs across successful searches without adding warning fields', async () => {
+      const { handleFindMatchingJobs } = await import('../../src/tools/advisor.js');
+      const { searchJobs } = await import('../../src/api/usajobs-client.js');
+      vi.mocked(searchJobs).mockResolvedValue({ SearchResultCount: 1, SearchResultCountAll: 1, SearchResultItems: [mockJobItem()] });
+      const result = await handleFindMatchingJobs({} as any, {});
+      expect(vi.mocked(searchJobs).mock.calls.length).toBeGreaterThan(1);
+      expect(result.isError).not.toBe(true);
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.total_results).toBe(1);
+      expect(parsed.results).toHaveLength(1);
+      expect(parsed.results[0].job_id).toBe('12345');
+      expect(Object.keys(parsed).sort()).toEqual(['keywords_used', 'results', 'total_results']);
+    });
+
     it('extracts keywords from CV and searches', async () => {
       const { handleFindMatchingJobs } = await import('../../src/tools/advisor.js');
       const { searchJobs } = await import('../../src/api/usajobs-client.js');

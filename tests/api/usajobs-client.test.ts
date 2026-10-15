@@ -29,6 +29,7 @@ describe('usajobs-client', () => {
       expect(axios.create).toHaveBeenCalledWith(
         expect.objectContaining({
           baseURL: 'https://data.usajobs.gov/api',
+          timeout: 15_000,
           headers: {
             Host: 'data.usajobs.gov',
             'User-Agent': 'test@email.com',
@@ -81,8 +82,24 @@ describe('usajobs-client', () => {
 
       const result = await fetchCodelist('occupationalseries');
 
-      expect(axios.get).toHaveBeenCalledWith('https://data.usajobs.gov/api/codelist/occupationalseries');
+      expect(axios.get).toHaveBeenCalledWith('https://data.usajobs.gov/api/codelist/occupationalseries', { timeout: 15_000 });
       expect(result.CodeList[0].ValidValue[0].Code).toBe('2210');
     });
   });
+});
+
+// The wrappers must preserve failures so handlers can distinguish outages from empty results.
+it('propagates search timeouts', async () => {
+  const { createApiClient, searchJobs } = await import('../../src/api/usajobs-client.js');
+  const client = createApiClient('test-key', 'test@example.com');
+  const error = Object.assign(new Error('timeout'), { code: 'ECONNABORTED' });
+  vi.mocked(client.get).mockRejectedValueOnce(error);
+  await expect(searchJobs(client, { Keyword: 'python' })).rejects.toBe(error);
+});
+
+it('propagates codelist timeouts', async () => {
+  const { fetchCodelist } = await import('../../src/api/usajobs-client.js');
+  const error = Object.assign(new Error('timeout'), { code: 'ECONNABORTED' });
+  vi.mocked(axios.get).mockRejectedValueOnce(error);
+  await expect(fetchCodelist('occupationalseries')).rejects.toBe(error);
 });
