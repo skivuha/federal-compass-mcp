@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.11](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.10...federal-compass-mcp-v0.1.11) (2026-11-18)
+
+
+### Bug Fixes
+
+* **deps:** patch vulnerable dependencies and unblock release CI ([056f60f](https://github.com/skivuha/federal-compass-mcp/commit/056f60f0aa148832f471a097bf802d709a32b8f6))
+* improve CLI startup and USAJobs error handling ([#126](https://github.com/skivuha/federal-compass-mcp/issues/126)) ([b3343fc](https://github.com/skivuha/federal-compass-mcp/commit/b3343fc22b0c2ba546369d49c0048e3477d9f26e))
+
 ## [0.1.10](https://github.com/skivuha/federal-compass-mcp/compare/federal-compass-mcp-v0.1.9...federal-compass-mcp-v0.1.10) (2026-07-27)
 
 
